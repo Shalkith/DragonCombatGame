@@ -62,8 +62,10 @@ class Combat:
             for i in temp:
                 if i["challengeid"] == self.challengeid:
                     i["status"] = "completed"
-                    i["winner"] = self.winner["id"]
-                    i["loser"] = self.loser["id"]
+                    i["winnerid"] = self.winner["id"]
+                    i["winnername"] = self.winner["name"]
+                    i["loserid"] = self.loser["id"]
+                    i["losername"] = self.loser["name"]
                     i["challenge_completed_time"] = datetime.datetime.now().strftime("%m/%d/%Y, %H:%M:%S")
 
                     break
