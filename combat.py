@@ -2,12 +2,17 @@
 import json 
 import random
 import datetime
+import config 
 
 class Combat:
     def __init__(self, challengeid):
+        self.challengesjson = config.challengesjson
+        self.dragonjson = config.dragonjson
+        self.combatlogjson = config.combatlogjson
+
         self.challengeid = challengeid
         #retrieve the challenge from the challenges.json file
-        with open("challenges.json", "r") as file:
+        with open(self.challengesjson, "r") as file:
             data = json.load(file)
             temp = data["challenges"]
             for i in temp:
@@ -17,7 +22,7 @@ class Combat:
             else:
                 raise ValueError("Challenge not found or not accepted")
         #retrieve the challenger and challengee from the dragons.json file
-        with open("dragon.json", "r") as file:
+        with open(self.dragonjson, "r") as file:
             data = json.load(file)
             temp = data["dragons"]
             for i in temp:
@@ -32,31 +37,37 @@ class Combat:
         # the combat log should include the winner, loser, and the time the combat was completed
         # The combat log should also include the challengeid, and latter_position of the winner and loser before and after combat
         try :
-            with open("combat_log.json", "r") as file:
+            with open(self.combatlogjson, "r") as file:
                 pass
         except:
             data = {"combat_log": []}
-            with open("combat_log.json", "w") as file:
+            with open(self.combatlogjson, "w") as file:
                 json.dump(data, file, indent=4)
-        with open("combat_log.json", "r") as file:
+        with open(self.combatlogjson, "r") as file:
             data = json.load(file)
             temp = data["combat_log"]
-            #append challengeid,time complete and winner object and a loser object, each containing name, id,latter_position, ownerid
-            temp.append({"challengeid": self.challengeid, "time_completed": str(self.challenge["challenge_completed_time"]), "winner": {"name": self.winner["name"], "id": self.winner["id"], "latter_position": self.winner["latter_position"], "ownerid": self.winner["ownerid"]}, "loser": {"name": self.loser["name"], "id": self.loser["id"], "latter_position": self.loser["latter_position"], "ownerid": self.loser["ownerid"]}})
+            #append challengeid,time complete and winner object and a loser object, each containing name, id,latter_position, ownerid, and if the dragnon is the challenger or challengee
+            temp.append({"challengeid": self.challengeid, "time_completed": self.challenge["challenge_completed_time"].strftime("%m/%d/%Y, %H:%M:%S"), 
+                         "winner": {"name": self.winner["name"], "id": self.winner["id"], "latter_position": self.winner["latter_position"], "ownerid": self.winner["ownerid"], "challenger": self.winner['id'] == self.challenger['id'], "challengee": self.winner['id'] == self.challengee['id']}, 
+                         "loser": {"name": self.loser["name"], "id": self.loser["id"], "latter_position": self.loser["latter_position"], "ownerid": self.loser["ownerid"], "challenger": self.loser['id'] == self.challenger['id'], "challengee": self.loser['id'] == self.challengee['id']}})
             
-        with open("combat_log.json", "w") as file:
+        with open(self.combatlogjson, "w") as file:
             json.dump(data, file, indent=4)
         
-        # update challenge.json to compelte
+        # update challenge.json to compelte and set the winner and loser
 
-        with open("challenges.json", "r") as file:
+        with open(self.challengesjson, "r") as file:
             data = json.load(file)
             temp = data["challenges"]
             for i in temp:
                 if i["challengeid"] == self.challengeid:
                     i["status"] = "completed"
+                    i["winner"] = self.winner["id"]
+                    i["loser"] = self.loser["id"]
+                    i["challenge_completed_time"] = datetime.datetime.now().strftime("%m/%d/%Y, %H:%M:%S")
+
                     break
-        with open("challenges.json", "w") as file:
+        with open(self.challengesjson, "w") as file:
             json.dump(data, file, indent=4)
         
 
@@ -84,16 +95,16 @@ class Combat:
         self.challenge["winner"] = self.winner["ownerid"]
         self.challenge["loser"] = self.loser["ownerid"]
         self.challenge["challenge_completed_time"] = datetime.datetime.now()
-        with open("challenges.json", "r") as file:
+        with open(self.challengesjson, "r") as file:
             data = json.load(file)
             temp = data["challenges"]
             for i in temp:
                 if i["challengeid"] == self.challengeid:
                     i = self.challenge
                     break
-        with open("challenges.json", "w") as file:
+        with open(self.challengesjson, "w") as file:
             json.dump(data, file, indent=4)
-        with open("dragon.json", "r") as file:
+        with open(self.dragonjson, "r") as file:
             data = json.load(file)
             temp = data["dragons"]
             for i in temp:
@@ -107,10 +118,10 @@ class Combat:
                     if self.loser["latter_position"] < self.winner["latter_position"]:
                         i["latter_position"] = self.winner["latter_position"]
 
-        with open("dragon.json", "w") as file:
+        with open(self.dragonjson, "w") as file:
             json.dump(data, file, indent=4)
         # pull the winner and loser from the dragon.json file
-        with open("dragon.json", "r") as file:
+        with open(self.dragonjson, "r") as file:
             data = json.load(file)
             temp = data["dragons"]
             for i in temp:

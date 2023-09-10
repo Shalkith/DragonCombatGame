@@ -27,19 +27,24 @@
 import random
 import json 
 import math
-import os
+import os 
+import config
 # create a class for the dragon
 class HatchDragon:
     # create a constructor method
     def __init__(self, name, breed, userid):
+        self.dragonjson = config.dragonjson
+
+
+
         self.debug = False
         #create an empty dragon.json file if it doesn't exist
         try:
-            with open("dragon.json", "r") as file:
+            with open(self.dragonjson , "r") as file:
                 pass
         except:
             data = {"dragons": []}
-            with open("dragon.json", "w") as file:
+            with open(self.dragonjson , "w") as file:
                 json.dump(data, file, indent=4)
 
         self.name = name
@@ -630,7 +635,7 @@ class HatchDragon:
     def read_json(self):
         # method to read the json file and know how many dragons exist
         # open the json file
-        with open("dragon.json", "r") as file:
+        with open(self.dragonjson , "r") as file:
             # load the json file
             data = json.load(file)
             # return the number of dragons in the json file
@@ -638,14 +643,14 @@ class HatchDragon:
     def save_dragon(self):
         # create a method to save the dragon to the json file
         # open the json file
-        with open("dragon.json", "r") as file:
+        with open(self.dragonjson , "r") as file:
             # read the file to make sure a dragon with the same name doesnt exist
             data = json.load(file)
             for dragon in data["dragons"]:
                 if dragon["name"] == self.name:
                     return
         # open the json file
-        with open("dragon.json", "r") as file:
+        with open(self.dragonjson , "r") as file:
             # load the json file
             data = json.load(file)
             # append the dragon to the json file
@@ -679,7 +684,7 @@ class HatchDragon:
 
             })
         # open the json file
-        with open("dragon.json", "w") as file:
+        with open(self.dragonjson , "w") as file:
             # save the data to the json file
             json.dump(data, file, indent=4)
     def print_stats(self):

@@ -6,15 +6,17 @@
 import json
 import random
 import datetime
+import config 
 class Challenge:
     def __init__(self):
+        self.challengesjson = config.challengesjson
         try:
-            with open("challenges.json", "r") as file:
+            #use the config.py file to get the path to the json file
+            with open(self.challengesjson, "r") as file:
                 pass
         except:
             data = {"challenges": []}
-            with open("challenges.json", "w") as file:
-
+            with open(self.challengesjson, "w") as file:
                 json.dump(data, file, indent=4)
         pass
 
@@ -22,7 +24,7 @@ class Challenge:
         # read the challenges.json file and find the challenge with the challengeid
         # if the challenge is found, set the status to accepted
         # if the challenge is not found, raise an error
-        with open("challenges.json", "r") as file:
+        with open(self.challengesjson, "r") as file:
             data = json.load(file)
             temp = data["challenges"]
             for i in temp:
@@ -31,7 +33,7 @@ class Challenge:
                     break
             else:
                 raise ValueError("Challenge not found")
-        with open("challenges.json", "w") as file:
+        with open(self.challengesjson, "w") as file:
             json.dump(data, file, indent=4)
 
     def initiate_challenge(self, challenger,challengee):
@@ -43,7 +45,7 @@ class Challenge:
         self.challengee_ownerid = challengee["ownerid"]
         self.challengee_dragonid = challengee["id"]
         # generate a challengeid that doesnt already exist in the json file
-        with open("challenges.json", "r") as file:
+        with open(self.challengesjson, "r") as file:
             data = json.load(file)
             temp = data["challenges"]
             while True:
@@ -58,6 +60,7 @@ class Challenge:
         self.status = "pending"
         self.loser = None
         self.winner = None
+        self.challenge_completed_time = None
         # create a variable that will store the time the challenge was sent based on datetime.datetime.now()
         self.challenge_sent_time = datetime.datetime.now()
 
@@ -87,17 +90,18 @@ class Challenge:
             "status": self.status,
             "loser": self.loser,
             "winner": self.winner,
-            "challenge_sent_time": self.challenge_sent_time.strftime("%m/%d/%Y, %H:%M:%S")
+            "challenge_sent_time": self.challenge_sent_time.strftime("%m/%d/%Y, %H:%M:%S"),
+            "challenge_completed_time": self.challenge_completed_time
         }
         self.challengejson = json.dumps(self.challenge)
 
         # write the challenge to the json file
-        with open("challenges.json", "r") as file:
+        with open(self.challengesjson, "r") as file:
             data = json.load(file)
             temp = data["challenges"]
             temp.append(self.challenge)
             data["challenges"] = temp
-        with open("challenges.json", "w") as file:
+        with open(self.challengesjson, "w") as file:
             json.dump(data, file, indent=4)
 
 
