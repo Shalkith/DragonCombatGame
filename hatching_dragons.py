@@ -29,15 +29,13 @@ import json
 import math
 import os 
 import config
+
 # create a class for the dragon
 class HatchDragon:
     # create a constructor method
     def __init__(self, name, breed, userid):
         self.dragonjson = config.dragonjson
-
-
-
-        self.debug = False
+        self.debug = config.debug
         #create an empty dragon.json file if it doesn't exist
         try:
             with open(self.dragonjson , "r") as file:
@@ -52,113 +50,116 @@ class HatchDragon:
         self.ownerid = userid
         # set the dragon's latter position to by reading the json file
         self.latter_position = self.read_json() + 1 
-        # set the dragon's development points to 0
-        self.development_points = 0 #devlopment points are used to improve the dragon's stats later in the game or even increase the dragon's age
-        # set the dragon's favor to 0
-        self.favor = 0 # favor is used to purchase "Gifts of Gaia" later in the game
-
-        #generate a unique id for the dragon that increases by 1 for each dragon created
         self.id = self.read_json() + 1
-
-
+        
         #every dragon starts with these same starting scores
-        # essence 1, age 1, claw attack skill 1, life 5
-        self.essence = 1
-        self.age = 1
-        self.claw_attack = 1 # this is a skill
-        self.life = 5
+        
+        self.age = config.age
+        self.wins = config.wins
+        self.losses = config.losses
 
-        #set all remaining stats to 0
-        self.attack = 0
-        self.defense = 0
-        self.body = 0
-        self.intellect = 0
-        self.will = 0
-        self.resist = 0
-        self.speed = 0
-        self.discipline = 0
-        self.tail_bash = 0
+        
+        # Attributes
+        self.attributes = config.attributes
+
+        self.attack = config.attack
+        self.defense = config.defense
+        self.body = config.body
+        self.intellect = config.intellect
+        self.will = config.will
+        self.resist = config.resist
+        self.speed = config.speed
+        self.discipline = config.discipline
+        self.life = config.life
+        self.essence = config.essence
+
+        # skills
+        self.tail_bash = config.tail_bash
+        self.claw_attack = config.claw_attack
+
+        # Development points and favor are used to improve the dragon's stats or increase the dragon's age
+        # Favor is used to purchase "Gifts of Gaia" later in the game
+        self.development_points = config.development_points
+        self.favor = config.favor
+
+
 
         #create lists to hold the dragon's abilitys spells and skills
-        self.attributes = ['attack','defense','body','intellect','will','resist','speed','discipline','life','essence']
-        self.abilitys = ['heal']
+
+        self.abilitys = []
         self.spells = []
-        self.skills = ['claw_attack','tail_bash']
+        self.skills = []
 
         # set the starting stats based on breed - these are improvement_cost,Aging_cost,starting_advances,Claw Attack (this is a skill),essence and life
-        if breed == "Red":
-            self.improvement_cost = 8
-            self.aging_cost = 50
-            self.starting_advances = 8
-            self.essence = 1
-        elif breed == "Blue":
-            self.improvement_cost = 7
-            self.aging_cost = 55
-            self.starting_advances = 7
-            self.essence = 1
-        elif breed == "Silver":
-            self.improvement_cost = 6
-            self.aging_cost = 60
-            self.starting_advances = 6
-            self.essence = 1
-        elif breed == "Brown":
-            self.improvement_cost = 5
-            self.aging_cost = 70
-            self.starting_advances = 5
-            self.essence = 1
+        # create a dictionary to hold the breed's stats
+        self.stats_starting = config.starting_breed_stats[self.breed]
+        self.stats_ceilings = config.breed_stats_ceiling[self.breed]
+        self.improvement_cost = self.stats_starting["improvement_cost"]
+        self.aging_cost = self.stats_starting["aging_cost"]
+        self.starting_advances = self.stats_starting["starting_advances"]
+
+        self.ceiling_attack = self.stats_ceilings["ceiling_attack"]
+        self.ceiling_defense = self.stats_ceilings["ceiling_defense"]
+        self.ceiling_body = self.stats_ceilings["ceiling_body"]
+        self.ceiling_intellect = self.stats_ceilings["ceiling_intellect"]
+        self.ceiling_will = self.stats_ceilings["ceiling_will"]
+        self.ceiling_resist = self.stats_ceilings["ceiling_resist"]
+        self.ceiling_speed = self.stats_ceilings["ceiling_speed"]
+        self.ceiling_discipline = self.stats_ceilings["ceiling_discipline"]
+        self.ceiling_life = self.stats_ceilings["ceiling_life"]
+        self.ceiling_essence = self.stats_ceilings["ceiling_essence"]
+        
+
+    def assign_skills_spells_abilitys(self):
+        # assign skills spells and abilitys based on breed and age
+        # use self.age to determine what skills spells and abilitys the dragon has access to
+        # use self.breed to determine what skills spells and abilitys the dragon has access to
+        # use self.skills, self.spells, and self.abilitys to store the skills spells and abilitys the dragon has access to
+
+        # use config.breed_abilities[self.breed] to determine what skills spells and abilitys the dragon has access to
+        # use config.breed_abilities[self.breed]["skills"] to determine what skills the dragon has access to
+        # use config.breed_abilities[self.breed]["spells"] to determine what spells the dragon has access to
+        # use config.breed_abilities[self.breed]["abilitys"] to determine what abilitys the dragon has access to
+
+        # each of these has a minimum age, if the dragon's age is less than the minimum age, the dragon does not have access to the skill
+        # if the dragon's age is greater than or equal to the minimum age, the dragon has access to the skill
+        # if the dragon has access to the skill, add it to the self.skills list
+
+        for skill in config.breed_abilities[self.breed]["skills"]:
+            if self.age >= config.breed_abilities[self.breed]["skills"][skill]["minimum_age"]:
+                self.skills.append(skill)   
+        for spell in config.breed_abilities[self.breed]["spells"]:
+            if self.age >= config.breed_abilities[self.breed]["spells"][spell]["minimum_age"]:
+                self.spells.append(spell)
+        for ability in config.breed_abilities[self.breed]["abilities"]:
+            if self.age >= config.breed_abilities[self.breed]["abilities"][ability]["minimum_age"]:
+                self.abilitys.append(ability)
+
+        # create an attribute for each of the skills, spells and abilitys and set it to 0
+        # except tail bash which is equal to body and claw attack which is equal to 1
 
 
-        # red breed attribute
-        if breed == "Red":
-            self.ceiling_attack = 20
-            self.ceiling_defense = 10
-            self.ceiling_body = 15
-            self.ceiling_intellect = 10
-            self.ceiling_will = 10
-            self.ceiling_resist = 10
-            self.ceiling_speed = 10
-            self.ceiling_discipline = 5
-            self.ceiling_life = 35
-            self.ceiling_essence = 15
-        # blue breed attribute
-        elif breed == "Blue":
-            self.ceiling_attack = 15
-            self.ceiling_defense = 15
-            self.ceiling_body = 10
-            self.ceiling_intellect = 15
-            self.ceiling_will = 10
-            self.ceiling_resist = 20
-            self.ceiling_speed = 10
-            self.ceiling_discipline = 10
-            self.ceiling_life = 30
-            self.ceiling_essence = 15
-        # silver breed attribute
-        elif breed == "Silver":
-            self.ceiling_attack = 5
-            self.ceiling_defense = 20
-            self.ceiling_body = 5
-            self.ceiling_intellect = 20
-            self.ceiling_will = 15
-            self.ceiling_resist = 15
-            self.ceiling_speed = 20
-            self.ceiling_discipline = 15
-            self.ceiling_life = 25
-            self.ceiling_essence = 15
-        # brown breed attribute
-        elif breed == "Brown":
-            self.ceiling_attack = 15
-            self.ceiling_defense = 10
-            self.ceiling_body = 20
-            self.ceiling_intellect = 15
-            self.ceiling_will = 15
-            self.ceiling_resist = 10
-            self.ceiling_speed = 5
-            self.ceiling_discipline = 20
-            self.ceiling_life = 30
-            self.ceiling_essence = 20
-        #each dragon starts has a win and loss count of 0
-        self.wins = 0
-        self.losses = 0
+        for skill in self.skills:
+            setattr(self, skill, 0)
+        for spell in self.spells:
+            setattr(self, spell, 0)
+        for ability in self.abilitys:
+            setattr(self, ability, 0)
+
+        # set tail bash to equal body
+        self.tail_bash = self.body
+        # set claw attack to equal 1
+        self.claw_attack = 1
+
+
+
+
+
+
+
+
+
+        
     def cpu_buff(self):
         # if the owner is cpu and the latter posisistion is within the top 20, increase the number of wins and losses to represent the dragons fighting history
         # the lower the position number, the more wins the dragon has   
@@ -246,11 +247,6 @@ class HatchDragon:
             print()
             input('.')
 
-
-
-
-                
-
         # randomly allocate the advancement points
         # the sum of the advancement points must equal the starting_advances for the breed
         # attributes
@@ -320,7 +316,38 @@ class HatchDragon:
                     continue
                 
                 # check to make sure the sum of the advancement points equals the starting_advances for the breed, if not, start over
-                if self.attack + self.defense + self.body + self.intellect + self.will + self.resist + self.speed + self.discipline + self.life-5 + self.essence-1 + self.claw_attack-1 != self.starting_advances:
+                # remember to subtract 1 from life and essence and 1 from claw attack and dont count tailbash
+                sum_of_attributes = 0
+                for attribute in self.attributes:
+                    if self.debug == True:
+                        print("Attribute "+attribute)
+                    if attribute != "life" and attribute != "essence":
+                        sum_of_attributes += getattr(self, attribute)
+                    elif attribute == "life":
+                        sum_of_attributes += getattr(self, attribute) - 5  # subtract 5 for life
+                    elif attribute == "essence":
+                        sum_of_attributes += getattr(self, attribute) - 1
+
+                sum_of_skills = 0
+                for skill in self.skills:
+                    if self.debug == True:
+                        print("Skill "+skill)
+                    if skill != "tail_bash":
+                        if skill != "claw_attack":
+                            sum_of_skills += getattr(self, skill)
+                        else:
+                            sum_of_skills += getattr(self, skill)-1
+                sum_of_spells = 0
+                for spell in self.spells:
+                    if self.debug == True:
+                        print("Spell "+spell)
+                    sum_of_spells += getattr(self, spell)
+                
+                sum_of_attributes += sum_of_skills
+                sum_of_attributes += sum_of_spells
+
+                if sum_of_attributes != self.starting_advances:
+                    print(sum_of_attributes)
                     if self.debug == True:
                         print("sum of attributes does not equal starting advances")
                         print("attack: " + str(self.attack))
@@ -333,7 +360,15 @@ class HatchDragon:
                         print("discipline: " + str(self.discipline))
                         print("life: " + str(self.life-5))
                         print("essence: " + str(self.essence-1))
-                        print("claw attack: " + str(self.claw_attack-1))
+                        #print skills and spells
+                        for skill in self.skills:
+                            if skill != "tail_bash":
+                                if skill != "claw_attack":
+                                    print(skill + ": " + str(getattr(self, skill)))
+                                else:
+                                    print(skill + ": " + str(getattr(self, skill)-1))
+                        for spell in self.spells:
+                            print(spell + ": " + str(getattr(self, spell)))
                         print("starting advances: " + str(self.starting_advances))
                         pass
 
@@ -462,8 +497,10 @@ class HatchDragon:
             # if the owner is not cpu, ask the user to enter the dragon's stats
             if self.ownerid == 'cpu':
                 self.cpu_buff()
+                self.assign_skills_spells_abilitys()
                 self.allocate_points()
                 self.advance_age()
+                
             else:
                 while True:
                     tempstartingadvances = self.starting_advances
@@ -653,36 +690,44 @@ class HatchDragon:
         with open(self.dragonjson , "r") as file:
             # load the json file
             data = json.load(file)
+            #create an empty dictionary to store the dragon's data
+
+            tempdragon = {}
+            tempdragon["id"] = self.id
+            tempdragon["ownerid"] = self.ownerid
+            tempdragon["name"] = self.name
+            tempdragon["breed"] = self.breed
+            tempdragon["age"] = self.age
+            tempdragon["attack"] = self.attack
+            tempdragon["defense"] = self.defense
+            tempdragon["body"] = self.body
+            tempdragon["intellect"] = self.intellect
+            tempdragon["will"] = self.will
+            tempdragon["resist"] = self.resist
+            tempdragon["speed"] = self.speed
+            tempdragon["discipline"] = self.discipline
+            tempdragon["life"] = self.life
+            tempdragon["essence"] = self.essence
+
+            for skill in self.skills:
+                tempdragon[skill] = getattr(self, skill)
+            for spell in self.spells:
+                tempdragon[spell] = getattr(self, spell)
+            for ability in self.abilitys:
+                tempdragon[ability] = getattr(self, ability)
+
+            tempdragon["skills"] = self.skills
+            tempdragon["spells"] = self.spells
+            tempdragon["abilitys"] = self.abilitys
+            tempdragon["development_points"] = self.development_points
+            tempdragon["favor"] = self.favor
+            tempdragon["wins"] = self.wins
+            tempdragon["losses"] = self.losses
+            tempdragon["latter_position"] = self.latter_position
+
             # append the dragon to the json file
-            data["dragons"].append({
-                "name": self.name,
-                "breed": self.breed,
-                "attack": self.attack,
-                "defense": self.defense,
-                "body": self.body,
-                "intellect": self.intellect,
-                "will": self.will,
-                "resist": self.resist,
-                "speed": self.speed,
-                "discipline": self.discipline,
-                "life": self.life,
-                "essence": self.essence,
-                "age": self.age,
-                "latter_position": self.latter_position,
-                "id": self.id,
-                "ownerid": self.ownerid,
-                "claw_attack": self.claw_attack,
-                "tail_bash": self.tail_bash,
-                "skills": self.skills,
-                "spells": self.spells, 
-                "abilitys": self.abilitys,
-                "development_points": self.development_points,
-                "favor": self.favor,
-                "wins": self.wins,
-                "losses": self.losses
+            data["dragons"].append(tempdragon)
 
-
-            })
         # open the json file
         with open(self.dragonjson , "w") as file:
             # save the data to the json file
@@ -711,7 +756,7 @@ class HatchDragon:
         print("Spells: " + str(self.spells))
         print("Abilitys: " + str(self.abilitys))
 
-def random_name():
+def random_name(breed):
     #generate a function to create a random name - the name should sound like a dragon name
     # use the following seed words to generate a two syllable name
     seed_words = [
@@ -730,6 +775,213 @@ def random_name():
     "Nether", "Eclipsewing", "Oblivion", "Frostclaw", "Viper", "Sapphirefire",
     "Cinderheart", "Dragonheart", "Stormblade", "Nightshade", "Moonshadow", "Thunderclaw",
     "Pyroclix", "Sablethorn", "Ebonflame", "Dreadfire"]
+    
+    # Red Dragons (Fire Theme)
+    red_dragons = [
+        "Blazeheart",
+        "Emberwing",
+        "Infernoflare",
+        "Pyroclaw",
+        "Ignisfury",
+        "Scorchscale",
+        "Magmawraith",
+        "Flamestrike",
+        "Cinderfang",
+        "Volcanorider",
+        "Heatwavecrest",
+        "Charblaze",
+        "Infernoflame",
+        "Fireclaw",
+        "Emberblaze",
+        "Blazewing",
+        "Pyroheart",
+        "Flamedrake",
+        "Scorchwing",
+        "Magmafire",
+    ]
+
+    # Blue Dragons (Water Theme)
+    blue_dragons = [
+        "Aquariusfin",
+        "Neptunesurge",
+        "Tidaldance",
+        "Azurewave",
+        "Serenewave",
+        "Marinecrest",
+        "Cascadescale",
+        "Nauticaldepths",
+        "Tsunamisurge",
+        "Riveratide",
+        "Mistralwhisper",
+        "Oceanuscrest",
+        "Aquanimbus",
+        "Neptunefury",
+        "Tidalcrystal",
+        "Azuremist",
+        "Serenesea",
+        "Marineflow",
+        "Cascadewings",
+        "Nauticaltide",
+    ]
+
+    # Silver Dragons (Weather Theme)
+    silver_dragons = [
+        "Nimbusstorm",
+        "Cyclonewind",
+        "Thunderstrike",
+        "Tempestsky",
+        "Aurorabeam",
+        "Zephyrglide",
+        "Hailstormfury",
+        "Drizzlemist",
+        "Celestialight",
+        "Stormridercrest",
+        "Meteorfall",
+        "Galeshadow",
+        "Nimbuswings",
+        "Cyclonewraith",
+        "Thunderstrikebolt",
+        "Tempestcloud",
+        "Auroradream",
+        "Zephyrtalon",
+        "Hailstormfrost",
+        "Drizzlerain",
+    ]
+
+    # Brown Dragons (Earth Theme)
+    brown_dragons = [
+        "Terrascale",
+        "Boulderhide",
+        "Grootroot",
+        "Gaiastrength",
+        "Rockyshield",
+        "Quakecrusher",
+        "Pebbleclaw",
+        "Dustywhisker",
+        "Granitebeard",
+        "Crumblestone",
+        "Rootfang",
+        "Cliffhanger",
+        "Terraearth",
+        "Boulderkin",
+        "Grootguardian",
+        "Gaiamight",
+        "Rockyridge",
+        "Quakemaw",
+        "Pebblepaw",
+        "Dustyfur",
+    ]
+
+
+    red_dragons_fname = [
+        "Blaze",
+        "Ember",
+        "Inferno",
+        "Pyro",
+        "Ignis",
+        "Scorch",
+        "Magma",
+        "Flame",
+        "Cinder",
+        "Volcano",
+        "Heatwave",
+        "Char",
+        "Fire",
+        "Fury",
+        "Flare",
+        "Dragonfire",
+        "Lava",
+        "Flamewind",
+        "Scald",
+        "Blazewing",
+    ]
+
+    # Blue Dragons (Water Theme)
+    blue_dragons_fname = [
+        "Aqua",
+        "Neptune",
+        "Tide",
+        "Azure",
+        "Serenity",
+        "Marine",
+        "Cascade",
+        "Nautical",
+        "Tsunami",
+        "River",
+        "Mistral",
+        "Ocean",
+        "Wave",
+        "Whisper",
+        "Deepsea",
+        "Aquatic",
+        "Navy",
+        "Sapphire",
+        "Tidal",
+    ]
+
+    # Silver Dragons (Weather Theme)
+    silver_dragons_fname = [
+        "Nimbus",
+        "Cyclone",
+        "Thunder",
+        "Tempest",
+        "Aurora",
+        "Zephyr",
+        "Hailstorm",
+        "Drizzle",
+        "Celestial",
+        "Storm",
+        "Meteor",
+        "Gale",
+        "Bolt",
+        "Sky",
+        "Lightning",
+        "Wind",
+        "Twister",
+        "Frost",
+        "Cloud",
+    ]
+
+    # Brown Dragons (Earth Theme)
+    brown_dragons_fname = [
+        "Terra",
+        "Boulder",
+        "Groot",
+        "Gaia",
+        "Rocky",
+        "Quake",
+        "Pebble",
+        "Dusty",
+        "Granite",
+        "Crumble",
+        "Root",
+        "Cliff",
+        "Stone",
+        "Mud",
+        "Earth",
+        "Mountain",
+        "Hill",
+        "Cave",
+        "Valley",
+    ]
+
+
+    if breed == "Red":
+        seed_words = red_dragons
+        seed_words_fname = red_dragons_fname
+    elif breed == "Blue":
+        seed_words = blue_dragons
+        seed_words_fname = blue_dragons_fname
+    elif breed == "Silver":
+        seed_words = silver_dragons
+        seed_words_fname = silver_dragons_fname
+    elif breed == "Brown":
+        seed_words = brown_dragons
+        seed_words_fname = brown_dragons_fname
+    else:
+        seed_words = seed_words
+        seed_words_fname = seed_words
+        
     # the two syllable name will be made up of two random words from the seed words
     # the same word can not be used twice
     # the first word will be capitalized
@@ -738,7 +990,7 @@ def random_name():
     # the name will be returned
     name = ""
     # generate the first word
-    first_word = random.choice(seed_words)
+    first_word = random.choice(seed_words_fname)
     # generate the second word
     second_word = random.choice(seed_words)
     # make sure the second word is not the same as the first word
@@ -756,21 +1008,20 @@ def random_name():
 def random_breed():
         # generate a function to create a random breed
         # the breed will be randomly selected from the following list
-        breeds = ["Red", "Blue", "Silver", "Brown"]
+        breeds = config.all_breeds
         # return the breed
         return random.choice(breeds),breeds
 def generatedragons(name,breed,ownerid,dragoncount):
-    
-    
+
     dragons = []
 
     if ownerid == 'cpu':
         #generate n random names
         names = []
         for i in range(dragoncount):
-            cpudragon = HatchDragon(name, breed, ownerid)
-            name = random_name()
             breed,breeds = random_breed()
+            name = random_name(breed)
+            
             dragon = HatchDragon(name, breed, ownerid)
             dragon.create_dragon()
             dragons.append(dragon)
