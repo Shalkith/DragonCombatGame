@@ -58,8 +58,7 @@ class Challenge:
                 break
         # set the status of the challenge to pending
         self.status = "pending"
-        self.loser = None
-        self.winner = None
+            
         self.challenge_completed_time = None
         # create a variable that will store the time the challenge was sent based on datetime.datetime.now()
         self.challenge_sent_time = datetime.datetime.now()
@@ -88,8 +87,6 @@ class Challenge:
             },
             "challengeid": self.challengeid,
             "status": self.status,
-            "loser": self.loser,
-            "winner": self.winner,
             "challenge_sent_time": self.challenge_sent_time.strftime("%m/%d/%Y, %H:%M:%S"),
             "challenge_completed_time": self.challenge_completed_time
         }
