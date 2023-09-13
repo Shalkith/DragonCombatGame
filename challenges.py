@@ -70,6 +70,11 @@ class Challenge:
         #if challengee_ownerid is cpu accept the challenge automatically
         if self.challengee_ownerid == "cpu":
             self.status = "accepted"
+        
+        # set the location for both dragons to location A
+        self.challenger_location = "A"
+        self.challengee_location = "A"
+
 
         # have a section for the challenger and the challengee
         self.challenge = {
@@ -77,13 +82,16 @@ class Challenge:
                 "dragonname": challenger["name"],
                 "dragonid": self.challenger_dragonid,
                 "latter_position": challenger["latter_position"],
-                "ownerid": self.challenger_ownerid
+                "ownerid": self.challenger_ownerid,
+                "location": self.challenger_location
+
             },
             "challengee": {
                 "dragonname": challengee["name"],
                 "dragonid": self.challengee_dragonid,
                 "latter_position": challengee["latter_position"],
                 "ownerid": self.challengee_ownerid,
+                "location": self.challengee_location
             },
             "challengeid": self.challengeid,
             "status": self.status,
