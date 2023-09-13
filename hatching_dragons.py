@@ -29,6 +29,7 @@ import json
 import math
 import os 
 import config
+import dragonlatter
 
 # create a class for the dragon
 class HatchDragon:
@@ -186,9 +187,20 @@ class HatchDragon:
             if self.latter_position >= 20:
                 self.wins = random.randint(25,50)
                 self.losses = 50-self.wins
-            if self.latter_position > 20:
-                self.wins = 0
-                self.losses = random.randint(0,25)
+            if self.latter_position >= 30:
+                self.wins = random.randint(15,25)
+                self.losses = 25-self.wins
+            if self.latter_position >= 40:
+                self.wins = random.randint(10,15)
+                self.losses = 15-self.wins
+            if self.latter_position >= 50:
+                self.wins = random.randint(0,15)
+                self.losses = 10-self.wins
+            if self.latter_position > 50:
+                self.wins = random.randint(0,5)
+                self.losses = 5-self.wins
+
+
 
         # assign starting advances for each win and loss. 
         # for each win give 0.5 advances and 1.5 favor rounded down
@@ -206,16 +218,18 @@ class HatchDragon:
 
         # if the owner is cpu and latter position is within the top 20, randomly increase the age. it should get closer to 8 as we move closer to position 1
         if self.ownerid == 'cpu':
-            if self.latter_position >= 20:
+            if self.latter_position <= 50:
+                self.age = random.randint(1,1)
+            if self.latter_position <= 30:
                 self.age = random.randint(1,2)
-            if self.latter_position >= 15:
-                self.age = random.randint(1,3)
+            if self.latter_position <= 20:
+                self.age = random.randint(2,3)
+            if self.latter_position <= 15:
+                self.age = random.randint(3,6)
             if self.latter_position <= 10:
-                self.age = random.randint(2,6)
+                self.age = random.randint(6,7)
             if self.latter_position <= 5:
-                self.age = random.randint(3,7)
-            if self.latter_position <= 3:
-                self.age = random.randint(5,8)
+                self.age = random.randint(7,8)
             if self.latter_position == 1:
                 self.age = random.randint(8,8)
     def allocate_points(self):
@@ -502,7 +516,11 @@ class HatchDragon:
                 self.advance_age()
                 
             else:
+                self.assign_skills_spells_abilitys()
                 while True:
+
+
+                    
                     tempstartingadvances = self.starting_advances
                     tempattack = self.attack
                     tempdefense = self.defense
@@ -515,7 +533,7 @@ class HatchDragon:
                     templife = self.life
                     tempessence = self.essence
                     tempclaw_attack = self.claw_attack
-                    
+                   
 
                     while tempstartingadvances > 0:
                         # clear the console
@@ -577,7 +595,7 @@ class HatchDragon:
                                 print('###############################################')
                                 print('###############################################')
                                 print()
-                                print("claw attack exceeds breed's limit. Please try again.")
+                                print("claw attack exceeds discipline limit. Please try again.")
                                 print()
                                 print('###############################################')
                                 print('###############################################')
@@ -595,36 +613,142 @@ class HatchDragon:
                     
                     temptail_bash = int(tempbody)
                     # check to see if any value is above the breed's limit, if so, start over
-                    if tempattack > self.ceiling_attack or tempdefense > self.ceiling_defense or tempbody > self.ceiling_body or tempintellect > self.ceiling_intellect or tempwill > self.ceiling_will or tempresist > self.ceiling_resist or tempspeed > self.ceiling_speed or tempdiscipline > self.ceiling_discipline or templife > self.ceiling_life or tempessence > self.ceiling_essence:
+                    if tempattack > self.ceiling_attack:
                         print()
                         print('###############################################')
-                        print('###############################################')
                         print()
-                        print("One or more of your values is above the breed's limit. Please try again.")
+                        print(" You attack value exceeds the breed's limit. Please try again.")
                         print()
-                        print('###############################################')
                         print('###############################################')
                         print()
                         input('press enter to continue')
                         
                         continue
+                    if tempdefense > self.ceiling_defense:
+                        print()
+                        print('###############################################')
+                        print()
+                        print(" You defense value exceeds the breed's limit. Please try again.")
+                        print()
+                        print('###############################################')
+                        print()
+                        input('press enter to continue')
+                        
+                        continue
+                    if tempbody > self.ceiling_body:
+                        print()
+                        print('###############################################')
+                        print()
+                        print(" You body value exceeds the breed's limit. Please try again.")
+                        print()
+                        print('###############################################')
+                        print()
+                        input('press enter to continue')
+                        
+                        continue
+                    if tempintellect > self.ceiling_intellect:
+                        print()
+                        print('###############################################')
+                        print()
+                        print(" You intellect value exceeds the breed's limit. Please try again.")
+                        print()
+                        print('###############################################')
+                        print()
+                        input('press enter to continue')
+                        
+                        continue
+                    if tempwill > self.ceiling_will:
+                        print()
+                        print('###############################################')
+                        print()
+                        print(" You will value exceeds the breed's limit. Please try again.")
+                        print()
+                        print('###############################################')
+                        print()
+                        input('press enter to continue')
+                        
+                        continue
+                    if tempresist > self.ceiling_resist:
+                        print()
+                        print('###############################################')
+                        print()
+                        print(" You resist value exceeds the breed's limit. Please try again.")
+                        print()
+                        print('###############################################')
+                        print()
+                        input('press enter to continue')
+                        
+                        continue
+                    if tempspeed > self.ceiling_speed:
+                        print()
+                        print('###############################################')
+                        print()
+                        print(" You speed value exceeds the breed's limit. Please try again.")
+                        print()
+                        print('###############################################')
+                        print()
+                        input('press enter to continue')
+                        
+                        continue
+                    if tempdiscipline > self.ceiling_discipline:
+                        print()
+                        print('###############################################')
+                        print()
+                        print(" You discipline value exceeds the breed's limit. Please try again.")
+                        print()
+                        print('###############################################')
+                        print()
+                        input('press enter to continue')
+                        
+                        continue
+                    if templife > self.ceiling_life:
+                        print()
+                        print('###############################################')
+                        print()
+                        print(" You life value exceeds the breed's limit. Please try again.")
+                        print()
+                        print('###############################################')
+                        print()
+                        input('press enter to continue')
+                        
+                        continue
+                    if tempessence > self.ceiling_essence:
+                        print()
+                        print('###############################################')
+                        print()
+                        print(" You essence value exceeds the breed's limit. Please try again.")
+                        print()
+                        print('###############################################')
+                        print()
+                        input('press enter to continue')
+                        
+                        continue
+
+
                     
+
                     # confirm we're not exceeding discipline for skills and spells found in the skills and spells lists above - use the temp variables
                     # exclude tail bash and claw attack if claw attack level 1
                     exceeds_discipline = False
                     for attribute in self.skills: 
                         if attribute != "tail_bash" and attribute != "claw_attack":
-                            if getattr(self, "temp"+attribute) >= getattr(self, "discipline"):
-                                print(attribute + " exceeds breed's limit. Please try again.")
-                                exceeds_discipline = True
+                            try:
+                                if getattr(self, "temp"+attribute) >= getattr(self, "discipline"):
+                                    print(attribute + " exceeds discipline. Please try again.")
+                                    exceeds_discipline = True
+                            except:
+                                pass
                     if tempclaw_attack > 1:
                         if tempclaw_attack >= tempdiscipline:
-                            print("claw attack exceeds breed's limit. Please try again.")
+                            print("claw attack exceeds discipline. Please try again.")
                             exceeds_discipline = True
                     for attribute in self.spells:
-                        if getattr(self, "temp"+attribute) >= getattr(self, "discipline"):
-                            print( attribute + " exceeds breed's limit. Please try again.")
-                            exceeds_discipline = True
+                        try:
+                            if getattr(self, "temp"+attribute) >= getattr(self, "discipline"):
+                                print( attribute + " exceeds discipline Please try again.")
+                                exceeds_discipline = True
+                        except:
+                            pass
                                 
                     if exceeds_discipline == True:
                         continue
@@ -759,225 +883,19 @@ class HatchDragon:
 def random_name(breed):
     #generate a function to create a random name - the name should sound like a dragon name
     # use the following seed words to generate a two syllable name
-    seed_words = [
-    "Fire", "Shadow", "Storm", "Frost", "Dragon", "Serpent", "Thunder", "Magma",
-    "Blaze", "Night", "Venom", "Ember", "Ice", "Wyrm", "Aurora", "Lightning",
-    "Obsidian", "Ruby", "Sapphire", "Inferno", "Crystal", "Vortex", "Gloom",
-    "Talon", "Steel", "Onyx", "Celestial", "Moon", "Sun", "Twilight", "Stormcaller",
-    "Earth", "Lava", "Abyss", "Fang", "Ash", "Gale", "Solar", "Lunar", "Frostbite",
-    "Crimson", "Void", "Quasar", "Nova", "Doom", "Eclipse", "Blizzard", "Cinder",
-    "Volcano", "Mystic", "Molten", "Rune", "Havoc", "Drake", "Wraith", "Tidal",
-    "Pulse", "Meteor", "Shadowfang", "Ethereal", "Amber", "Thunderstrike", "Penumbral",
-    "Whisper", "Maelstrom", "Ignition", "Ebon", "Plasma", "Sable", "Venomous", "Sorcerer",
-    "Ironclad", "Arctic", "Nebula", "Ragnarok", "Basilisk", "Nocturnal", "Cerulean",
-    "Phoenix", "Specter", "Xenon", "Titan", "Labyrinth", "Chaos", "Crimsonscale",
-    "Flamewing", "Glimmer", "Horizon", "Lorekeeper", "Typhoon", "Scarlet", "Glacial",
-    "Nether", "Eclipsewing", "Oblivion", "Frostclaw", "Viper", "Sapphirefire",
-    "Cinderheart", "Dragonheart", "Stormblade", "Nightshade", "Moonshadow", "Thunderclaw",
-    "Pyroclix", "Sablethorn", "Ebonflame", "Dreadfire"]
-    
-    # Red Dragons (Fire Theme)
-    red_dragons = [
-        "Blazeheart",
-        "Emberwing",
-        "Infernoflare",
-        "Pyroclaw",
-        "Ignisfury",
-        "Scorchscale",
-        "Magmawraith",
-        "Flamestrike",
-        "Cinderfang",
-        "Volcanorider",
-        "Heatwavecrest",
-        "Charblaze",
-        "Infernoflame",
-        "Fireclaw",
-        "Emberblaze",
-        "Blazewing",
-        "Pyroheart",
-        "Flamedrake",
-        "Scorchwing",
-        "Magmafire",
-    ]
-
-    # Blue Dragons (Water Theme)
-    blue_dragons = [
-        "Aquariusfin",
-        "Neptunesurge",
-        "Tidaldance",
-        "Azurewave",
-        "Serenewave",
-        "Marinecrest",
-        "Cascadescale",
-        "Nauticaldepths",
-        "Tsunamisurge",
-        "Riveratide",
-        "Mistralwhisper",
-        "Oceanuscrest",
-        "Aquanimbus",
-        "Neptunefury",
-        "Tidalcrystal",
-        "Azuremist",
-        "Serenesea",
-        "Marineflow",
-        "Cascadewings",
-        "Nauticaltide",
-    ]
-
-    # Silver Dragons (Weather Theme)
-    silver_dragons = [
-        "Nimbusstorm",
-        "Cyclonewind",
-        "Thunderstrike",
-        "Tempestsky",
-        "Aurorabeam",
-        "Zephyrglide",
-        "Hailstormfury",
-        "Drizzlemist",
-        "Celestialight",
-        "Stormridercrest",
-        "Meteorfall",
-        "Galeshadow",
-        "Nimbuswings",
-        "Cyclonewraith",
-        "Thunderstrikebolt",
-        "Tempestcloud",
-        "Auroradream",
-        "Zephyrtalon",
-        "Hailstormfrost",
-        "Drizzlerain",
-    ]
-
-    # Brown Dragons (Earth Theme)
-    brown_dragons = [
-        "Terrascale",
-        "Boulderhide",
-        "Grootroot",
-        "Gaiastrength",
-        "Rockyshield",
-        "Quakecrusher",
-        "Pebbleclaw",
-        "Dustywhisker",
-        "Granitebeard",
-        "Crumblestone",
-        "Rootfang",
-        "Cliffhanger",
-        "Terraearth",
-        "Boulderkin",
-        "Grootguardian",
-        "Gaiamight",
-        "Rockyridge",
-        "Quakemaw",
-        "Pebblepaw",
-        "Dustyfur",
-    ]
-
-
-    red_dragons_fname = [
-        "Blaze",
-        "Ember",
-        "Inferno",
-        "Pyro",
-        "Ignis",
-        "Scorch",
-        "Magma",
-        "Flame",
-        "Cinder",
-        "Volcano",
-        "Heatwave",
-        "Char",
-        "Fire",
-        "Fury",
-        "Flare",
-        "Dragonfire",
-        "Lava",
-        "Flamewind",
-        "Scald",
-        "Blazewing",
-    ]
-
-    # Blue Dragons (Water Theme)
-    blue_dragons_fname = [
-        "Aqua",
-        "Neptune",
-        "Tide",
-        "Azure",
-        "Serenity",
-        "Marine",
-        "Cascade",
-        "Nautical",
-        "Tsunami",
-        "River",
-        "Mistral",
-        "Ocean",
-        "Wave",
-        "Whisper",
-        "Deepsea",
-        "Aquatic",
-        "Navy",
-        "Sapphire",
-        "Tidal",
-    ]
-
-    # Silver Dragons (Weather Theme)
-    silver_dragons_fname = [
-        "Nimbus",
-        "Cyclone",
-        "Thunder",
-        "Tempest",
-        "Aurora",
-        "Zephyr",
-        "Hailstorm",
-        "Drizzle",
-        "Celestial",
-        "Storm",
-        "Meteor",
-        "Gale",
-        "Bolt",
-        "Sky",
-        "Lightning",
-        "Wind",
-        "Twister",
-        "Frost",
-        "Cloud",
-    ]
-
-    # Brown Dragons (Earth Theme)
-    brown_dragons_fname = [
-        "Terra",
-        "Boulder",
-        "Groot",
-        "Gaia",
-        "Rocky",
-        "Quake",
-        "Pebble",
-        "Dusty",
-        "Granite",
-        "Crumble",
-        "Root",
-        "Cliff",
-        "Stone",
-        "Mud",
-        "Earth",
-        "Mountain",
-        "Hill",
-        "Cave",
-        "Valley",
-    ]
-
 
     if breed == "Red":
-        seed_words = red_dragons
-        seed_words_fname = red_dragons_fname
+        seed_words = config.red_dragons
+        seed_words_fname = config.red_dragons_fname
     elif breed == "Blue":
-        seed_words = blue_dragons
-        seed_words_fname = blue_dragons_fname
+        seed_words = config.blue_dragons
+        seed_words_fname = config.blue_dragons_fname
     elif breed == "Silver":
-        seed_words = silver_dragons
-        seed_words_fname = silver_dragons_fname
+        seed_words = config.silver_dragons
+        seed_words_fname = config.silver_dragons_fname
     elif breed == "Brown":
-        seed_words = brown_dragons
-        seed_words_fname = brown_dragons_fname
+        seed_words = config.brown_dragons
+        seed_words_fname = config.brown_dragons_fname       
     else:
         seed_words = seed_words
         seed_words_fname = seed_words
@@ -994,7 +912,7 @@ def random_name(breed):
     # generate the second word
     second_word = random.choice(seed_words)
     # make sure the second word is not the same as the first word
-    while second_word == first_word:
+    while second_word == first_word or first_word.lower() in second_word.lower() or second_word.lower() in first_word.lower():
         second_word = random.choice(seed_words)
     # capitalize the first word
     first_word = first_word.capitalize()
@@ -1029,6 +947,7 @@ def generatedragons(name,breed,ownerid,dragoncount):
             # print the dragon's stats
             dragon.print_stats()    
 
+
     else: #ownerid is not cpu
         _,breeds = random_breed()
         if breed not in breeds:
@@ -1043,25 +962,45 @@ def generatedragons(name,breed,ownerid,dragoncount):
         dragon.save_dragon()
         # print the dragon's stats
         dragon.print_stats()
+    
+    dragonlatter.create_dragon_html()
 
 
 if __name__ == "__main__":
+    config.clear_screen()
     # ask if this dragon is for a user or cpu
     # if the dragon is for a user, ask the user to enter the dragon's namem, breed, and ownerid
     response = input('Is this dragon for a user or cpu? (u/c):')
     if response == 'u':
+        
         _,breeds = random_breed()
+        while True:
+            config.clear_screen()
         # ask user to select a breed from list
-        breed = input("Enter the dragon's breed: "+breeds)
-        if breed not in breeds:
-            print("Invalid breed. Options are Red, Blue, Silver, Brown")
-        if breed in breeds:
+            print("Select a breed from the following list:")
+            print("1. Red")
+            print("2. Blue")
+            print("3. Silver")
+            print("4. Brown")
+            response = input("select your breed: ")
+            if response == "1":
+                breed = "Red"
+            elif response == "2":
+                breed = "Blue"
+            elif response == "3":
+                breed = "Silver"
+            elif response == "4":
+                breed = "Brown"
+            else:
+                print("Invalid response. Please try again.")
+                input('Press enter to continue')
+                continue
+
             name = input("Enter the dragon's name: ")
             ownerid = input("Enter the dragon's ownerid: ")
-            generatedragons(name,breed,ownerid,1)
-        breed = input("Enter the dragon's breed: ")
-        ownerid = input("Enter the dragon's ownerid: ")
+            break
         generatedragons(name,breed,ownerid,1)
+        
     elif response == 'c':
         #ask how many dragons to generate - only accept a number
         dragoncount = input("How many CPU dragons would you like to generate? ")
