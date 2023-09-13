@@ -1,22 +1,27 @@
 debug = False
 
+def clear_screen():
+    import os
+    # clear the console
+    os.system('cls' if os.name == 'nt' else 'clear')
+
 # document the locations of all the files and directories used in the project
 
 # Path to the directory containing the json files
 JSON_DIR = "json_files"
-
+template_dir = "html"
 #make a string for each json file
-DRAGON_JSON = "dragon.json"
-CHALLENGES_JSON = "challenges.json"
-COMBAT_LOG_JSON = "combat_log.json"
-DAMAGE_CHART_JSON = "damage_chart.json"
+DRAGON_JSON_filename = "dragon.json"
+CHALLENGES_JSON_filename = "challenges.json"
+COMBAT_LOG_JSON_filename = "combat_log.json"
+DAMAGE_CHART_JSON_filename = "damage_chart.json"
 
 
 #create a string for the path to each json file
-challengesjson =  JSON_DIR+"/"+CHALLENGES_JSON
-dragonjson = JSON_DIR+"/"+DRAGON_JSON
-combatlogjson = JSON_DIR+"/"+COMBAT_LOG_JSON
-damagechartjson = JSON_DIR+"/"+DAMAGE_CHART_JSON
+challengesjson =  JSON_DIR+"/"+CHALLENGES_JSON_filename
+dragonjson = JSON_DIR+"/"+DRAGON_JSON_filename
+combatlogjson = JSON_DIR+"/"+COMBAT_LOG_JSON_filename
+damagechartjson = JSON_DIR+"/"+DAMAGE_CHART_JSON_filename
 
 attributes = ['attack','defense','body','intellect','will','resist','speed','discipline','life','essence']
 
@@ -82,58 +87,265 @@ breed_stats_ceiling = {"Red" : {"ceiling_attack": 20,"ceiling_defense": 10,"ceil
                 "Brown" : {"ceiling_attack": 15,"ceiling_defense": 10,"ceiling_body": 20,"ceiling_intellect": 15,"ceiling_will": 15,"ceiling_resist": 10,"ceiling_speed": 5,"ceiling_discipline": 20,"ceiling_life": 30,"ceiling_essence": 20}
                 } 
 #abilitys attacks and spells per breed  
+
 breed_abilities = {"Red": 
                     {
-                        "abilities": {"heal": {"minimum_age": 1}},
-                        "skills": {"claw_attack": { "minimum_age": 1},
-                                    "tail_bash": { "minimum_age": 1},
-                                    "flame_tongue": {"minimum_age": 1},
-                                    "double_slash": {"minimum_age": 2},
-                                    "molten_horns": {"minimum_age": 3},
-                                    "fire_breath": {"minimum_age": 4},
-                                    "tail_blaze": {"minimum_age": 4},
-                                    "ember_wings": {"minimum_age": 6},
-                                    "absoulte_rend": {"minimum_age": 7},
-                                    "bezerker_rage": {"minimum_age": 8}},
+                        "abilities": {"heal": {"name":"Heal" ,"minimum_age": 1,"damage_code":None,"damage_rating":None,"duration":"Instant","effect":"increases life","essence_used":2}},
+                        "skills": {"claw_attack": {"name":"Claw Attack", "minimum_age": 1,"damage_code":"E", "damage_rating":"CurrentSkillLevel","duration":"Instant","effect":"claws opponent","essence_used":1},
+                                    "tail_bash": {"name":"Tail Bash", "minimum_age": 1,"damage_code":"B", "damage_rating":"CurrentBodyLevel","duration":"Instant","effect":"bashes opponent with tail","essence_used":"CurrentBodyLevel"},
+                                    "flame_tongue": {"name":"Flame Tongue", "minimum_age": 1},
+                                    "double_slash": {"name":"Double Slash", "minimum_age": 2},
+                                    "molten_horns": {"name":"Molten Horns", "minimum_age": 3},
+                                    "fire_breath": {"name":"Fire Breath", "minimum_age": 4},
+                                    "tail_blaze": {"name":"Tail Blaze", "minimum_age": 4},
+                                    "ember_wings": {"name":"Ember Wings", "minimum_age": 6},
+                                    "absoulte_rend": {"name":"Absoulte Rend", "minimum_age": 7},
+                                    "bezerker_rage": {"name":"Bezerker Rage", "minimum_age": 8}},
                         "spells": {}},
                     "Blue":
                         {
-                            "abilities": {"heal": {"minimum_age": 1}},
-                            "skills": {"claw_attack": { "minimum_age": 1},
-                                        "tail_bash": { "minimum_age": 1},
-                                        "bitter_chomp": {"minimum_age": 1},
-                                        "seaweed_mane": {"minimum_age": 2},
-                                        "tail_slash": {"minimum_age": 3},
-                                        "poison_breath": {"minimum_age": 3},
-                                        "whirlpool_eyes": {"minimum_age": 4}},
-                            "spells": {"body_of_water": {"minimum_age": 4},
-                                       "oceans_embace": {"minimum_age": 6},
-                                       "drain_life": {"minimum_age": 8}}},
+                            "abilities": {"heal": {"name":"Heal" ,"minimum_age": 1,"damage_code":None,"damage_rating":None,"duration":"Instant","effect":"increases life","essence_used":2}},
+                        "skills": {"claw_attack": {"name":"Claw Attack", "minimum_age": 1,"damage_code":"E", "damage_rating":"CurrentSkillLevel","duration":"Instant","effect":"claws opponent","essence_used":1},
+                                    "tail_bash": {"name":"Tail Bash", "minimum_age": 1,"damage_code":"B", "damage_rating":"CurrentBodyLevel","duration":"Instant","effect":"bashes opponent with tail","essence_used":"CurrentBodyLevel"},
+                                        "bitter_chomp": {"name":"Bitter Chomp", "minimum_age": 1},
+                                        "seaweed_mane": {"name":"Seaweed Mane", "minimum_age": 2},
+                                        "tail_slash": {"name":"Tail Slash", "minimum_age": 3},
+                                        "poison_breath": {"name":"Poison Breath", "minimum_age": 3},
+                                        "whirlpool_eyes": {"name":"Whirlpool Eyes", "minimum_age": 4}},
+                            "spells": {"body_of_water": {"name":"Body of Water", "minimum_age": 4},
+                                        "oceans_embace": {"name":"Oceans Embrace", "minimum_age": 6},
+                                        "drain_life": {"name":"Drain Life", "minimum_age": 8}}},
                     "Silver":
                         {
-                            "abilities": {"heal": {"minimum_age": 1}},
-                            "skills": {"claw_attack": { "minimum_age": 1},
-                                        "tail_bash": { "minimum_age": 1},
-                                        "lightning_breath": {"minimum_age": 2}},
-                            "spells": {"refreshing_winds": {"minimum_age": 1},
-                                        "wings_of_air": {"minimum_age": 3},
-                                        "maddening_winds": {"minimum_age": 4},
-                                        "tornado": {"minimum_age": 5},
-                                        "vapors_kiss": {"minimum_age": 6},
-                                        "gapsp_for_air": {"minimum_age": 7},
-                                        "silence": {"minimum_age": 7}}},
+                            "abilities": {"heal": {"name":"Heal" ,"minimum_age": 1,"damage_code":None,"damage_rating":None,"duration":"Instant","effect":"increases life","essence_used":2}},
+                        "skills": {"claw_attack": {"name":"Claw Attack", "minimum_age": 1,"damage_code":"E", "damage_rating":"CurrentSkillLevel","duration":"Instant","effect":"claws opponent","essence_used":1},
+                                    "tail_bash": {"name":"Tail Bash", "minimum_age": 1,"damage_code":"B", "damage_rating":"CurrentBodyLevel","duration":"Instant","effect":"bashes opponent with tail","essence_used":"CurrentBodyLevel"},
+                                        "lightning_breath": {"name":"Lightning Breath", "minimum_age": 2}},
+                            "spells": {"refreshing_winds": {"name":"Refreshing Winds", "minimum_age": 1},
+                                        "wings_of_air": {"name":"Wings of Air", "minimum_age": 3},
+                                        "maddening_winds": {"name":"Maddening Winds", "minimum_age": 4},
+                                        "tornado": {"name":"Tornado", "minimum_age": 5},
+                                        "vapors_kiss": {"name":"Vapors Kiss", "minimum_age": 6},
+                                        "gapsp_for_air": {"name":"Gasp for Air", "minimum_age": 7},
+                                        "silence": {"name":"Silence", "minimum_age": 7}}},
                     "Brown":
                         {
-                            "abilities": {"heal": {"minimum_age": 1},
-                                        "stones_touch": {"minimum_age": 1}},
-                            "skills": {"claw_attack": { "minimum_age": 1},
-                                        "tail_bash": { "minimum_age": 1},
-                                        "mud_slide": {"minimum_age": 2},
-                                        "yummy_rock_suprise": {"minimum_age": 3},
-                                        "battering_ram": {"minimum_age": 5}},
-                            "spells": {"earths_protection": {"minimum_age": 1},
-                                        "petrify": {"minimum_age": 6},
-                                        "wrath_of_earth": {"minimum_age": 7},
-                                        "call_of_gaia": {"minimum_age": 8}}}
-}
+                            "abilities": {"heal": {"name":"Heal" ,"minimum_age": 1,"damage_code":None,"damage_rating":None,"duration":"Instant","effect":"increases life","essence_used":2},
+                                        "stones_touch": {"name":"Stones Touch" ,"minimum_age": 1}},
+                        "skills": {"claw_attack": {"name":"Claw Attack", "minimum_age": 1,"damage_code":"E", "damage_rating":"CurrentSkillLevel","duration":"Instant","effect":"claws opponent","essence_used":1},
+                                    "tail_bash": {"name":"Tail Bash", "minimum_age": 1,"damage_code":"B", "damage_rating":"CurrentBodyLevel","duration":"Instant","effect":"bashes opponent with tail","essence_used":"CurrentBodyLevel"},
+                                        "mud_slide": {"name":"Mud Slide", "minimum_age": 2},
+                                        "yummy_rock_suprise": {"name":"Yummy Rock Suprise", "minimum_age": 3},
+                                        "battering_ram": {"name":"Battering Ram", "minimum_age": 5}},
+                            "spells": {"earths_protection": {"name":"Earths Protection", "minimum_age": 1},
+                                        "petrify": {"name":"Petrify", "minimum_age": 6},
+                                        "wrath_of_earth": {"name":"Wrath of Earth", "minimum_age": 7},
+                                        "call_of_gaia": {"name":"Call of Gaia", "minimum_age": 8}}}
+                    }
 
+
+seed_words = [
+    "Fire", "Shadow", "Storm", "Frost", "Dragon", "Serpent", "Thunder", "Magma",
+    "Blaze", "Night", "Venom", "Ember", "Ice", "Wyrm", "Aurora", "Lightning",
+    "Obsidian", "Ruby", "Sapphire", "Inferno", "Crystal", "Vortex", "Gloom",
+    "Talon", "Steel", "Onyx", "Celestial", "Moon", "Sun", "Twilight", "Stormcaller",
+    "Earth", "Lava", "Abyss", "Fang", "Ash", "Gale", "Solar", "Lunar", "Frostbite",
+    "Crimson", "Void", "Quasar", "Nova", "Doom", "Eclipse", "Blizzard", "Cinder",
+    "Volcano", "Mystic", "Molten", "Rune", "Havoc", "Drake", "Wraith", "Tidal",
+    "Pulse", "Meteor", "Shadowfang", "Ethereal", "Amber", "Thunderstrike", "Penumbral",
+    "Whisper", "Maelstrom", "Ignition", "Ebon", "Plasma", "Sable", "Venomous", "Sorcerer",
+    "Ironclad", "Arctic", "Nebula", "Ragnarok", "Basilisk", "Nocturnal", "Cerulean",
+    "Phoenix", "Specter", "Xenon", "Titan", "Labyrinth", "Chaos", "Crimsonscale",
+    "Flamewing", "Glimmer", "Horizon", "Lorekeeper", "Typhoon", "Scarlet", "Glacial",
+    "Nether", "Eclipsewing", "Oblivion", "Frostclaw", "Viper", "Sapphirefire",
+    "Cinderheart", "Dragonheart", "Stormblade", "Nightshade", "Moonshadow", "Thunderclaw",
+    "Pyroclix", "Sablethorn", "Ebonflame", "Dreadfire"]
+    
+# Red Dragons (Fire Theme)
+red_dragons = [
+    "Blazeheart",
+    "Emberwing",
+    "Infernoflare",
+    "Pyroclaw",
+    "Ignisfury",
+    "Scorchscale",
+    "Magmawraith",
+    "Flamestrike",
+    "Cinderfang",
+    "Volcanorider",
+    "Heatwavecrest",
+    "Charblaze",
+    "Infernoflame",
+    "Fireclaw",
+    "Emberblaze",
+    "Blazewing",
+    "Pyroheart",
+    "Flamedrake",
+    "Scorchwing",
+    "Magmafire",
+]
+
+# Blue Dragons (Water Theme)
+blue_dragons = [
+    "Aquariusfin",
+    "Neptunesurge",
+    "Tidaldance",
+    "Azurewave",
+    "Serenewave",
+    "Marinecrest",
+    "Cascadescale",
+    "Nauticaldepths",
+    "Tsunamisurge",
+    "Riveratide",
+    "Mistralwhisper",
+    "Oceanuscrest",
+    "Aquanimbus",
+    "Neptunefury",
+    "Tidalcrystal",
+    "Azuremist",
+    "Serenesea",
+    "Marineflow",
+    "Cascadewings",
+    "Nauticaltide",
+]
+
+# Silver Dragons (Weather Theme)
+silver_dragons = [
+    "Nimbusstorm",
+    "Cyclonewind",
+    "Thunderstrike",
+    "Tempestsky",
+    "Aurorabeam",
+    "Zephyrglide",
+    "Hailstormfury",
+    "Drizzlemist",
+    "Celestialight",
+    "Stormridercrest",
+    "Meteorfall",
+    "Galeshadow",
+    "Nimbuswings",
+    "Cyclonewraith",
+    "Thunderstrikebolt",
+    "Tempestcloud",
+    "Auroradream",
+    "Zephyrtalon",
+    "Hailstormfrost",
+    "Drizzlerain",
+]
+
+# Brown Dragons (Earth Theme)
+brown_dragons = [
+    "Terrascale",
+    "Boulderhide",
+    "Grootroot",
+    "Gaiastrength",
+    "Rockyshield",
+    "Quakecrusher",
+    "Pebbleclaw",
+    "Dustywhisker",
+    "Granitebeard",
+    "Crumblestone",
+    "Rootfang",
+    "Cliffhanger",
+    "Terraearth",
+    "Boulderkin",
+    "Grootguardian",
+    "Gaiamight",
+    "Rockyridge",
+    "Quakemaw",
+    "Pebblepaw",
+    "Dustyfur",
+]
+
+
+red_dragons_fname = [
+    "Blaze",
+    "Ember",
+    "Inferno",
+    "Pyro",
+    "Ignis",
+    "Scorch",
+    "Magma",
+    "Flame",
+    "Cinder",
+    "Volcano",
+    "Heatwave",
+    "Char",
+    "Fire",
+    "Fury",
+    "Flare",
+    "Dragonfire",
+    "Lava",
+    "Flamewind",
+    "Scald",
+    "Blazewing",
+]
+
+# Blue Dragons (Water Theme)
+blue_dragons_fname = [
+    "Aqua",
+    "Neptune",
+    "Tide",
+    "Azure",
+    "Serenity",
+    "Marine",
+    "Cascade",
+    "Nautical",
+    "Tsunami",
+    "River",
+    "Mistral",
+    "Ocean",
+    "Wave",
+    "Whisper",
+    "Deepsea",
+    "Aquatic",
+    "Navy",
+    "Sapphire",
+    "Tidal",
+]
+
+# Silver Dragons (Weather Theme)
+silver_dragons_fname = [
+    "Nimbus",
+    "Cyclone",
+    "Thunder",
+    "Tempest",
+    "Aurora",
+    "Zephyr",
+    "Hailstorm",
+    "Drizzle",
+    "Celestial",
+    "Storm",
+    "Meteor",
+    "Gale",
+    "Bolt",
+    "Sky",
+    "Lightning",
+    "Wind",
+    "Twister",
+    "Frost",
+    "Cloud",
+]
+
+# Brown Dragons (Earth Theme)
+brown_dragons_fname = [
+    "Terra",
+    "Boulder",
+    "Groot",
+    "Gaia",
+    "Rocky",
+    "Quake",
+    "Pebble",
+    "Dusty",
+    "Granite",
+    "Crumble",
+    "Root",
+    "Cliff",
+    "Stone",
+    "Mud",
+    "Earth",
+    "Mountain",
+    "Hill",
+    "Cave",
+    "Valley",
+]
