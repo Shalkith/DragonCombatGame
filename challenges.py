@@ -75,28 +75,129 @@ class Challenge:
         self.challenger_location = "A"
         self.challengee_location = "A"
 
+        #set active_turn to false for both dragons intially
+        self.challenger_active_turn = False
+        self.challengee_active_turn = False
+
+        #set challenge step to pending
+        self.challenge_step = "pending"
+        #set combat step to 0
+        self.combat_step = 1
+        # set status effects to an empty list for both dragons
+        self.status_effects = []
+
+
+        #set the starting life / max life for both dragons based on dragon.json
+        # Also set combat dice - this is equal to speed divided by 10 rounded down plus 1
+
+        
+
+        with open(config.dragonjson, "r") as file:
+            dragons = json.load(file)
+            for i in dragons["dragons"]:
+                if i["id"] == self.challenger_dragonid:
+                    self.challenger_life = i["life"]
+                    self.challenger_max_life = i["life"]
+                    self.challenger_combat_dice = i["speed"] // 10 + 1
+                    self.challenger_essence = i["essence"]
+                    self.challenger_max_essence = i["essence"]
+                    self.challenger_speed = i["speed"]
+                    self.challenger_attack = i["attack"]
+                    self.challenger_defense = i["defense"]
+                    self.challenger_intellect = i["intellect"]
+                    self.challenger_will = i["will"]
+                    self.challenger_body = i["body"]
+                    self.challenger_resist = i["resist"]
+                    self.challenger_speed = i["speed"]
+                    self.challenger_skills = i["skills"]
+                    self.challenger_spells = i["spells"]
+                    self.challenger_abilities = i["abilities"]
+
+                    
+                elif i["id"] == self.challengee_dragonid:
+                    self.challengee_life = i["life"]
+                    self.challengee_max_life = i["life"]
+                    self.challengee_combat_dice = i["speed"] // 10 + 1
+                    self.challengee_essence = i["essence"]
+                    self.challengee_max_essence = i["essence"]
+                    self.challengee_speed = i["speed"]
+                    self.challengee_attack = i["attack"]
+                    self.challengee_defense = i["defense"]
+                    self.challengee_intellect = i["intellect"]
+                    self.challengee_will = i["will"]
+                    self.challengee_body = i["body"]
+                    self.challengee_resist = i["resist"]
+                    self.challengee_skills = i["skills"]
+                    self.challengee_spells = i["spells"]
+                    self.challengee_abilities = i["abilities"]
+
+
+
+
+
+
+
+
 
         # have a section for the challenger and the challengee
         self.challenge = {
-            "challenger": {
-                "dragonname": challenger["name"],
-                "dragonid": self.challenger_dragonid,
-                "latter_position": challenger["latter_position"],
-                "ownerid": self.challenger_ownerid,
-                "location": self.challenger_location
-
-            },
-            "challengee": {
-                "dragonname": challengee["name"],
-                "dragonid": self.challengee_dragonid,
-                "latter_position": challengee["latter_position"],
-                "ownerid": self.challengee_ownerid,
-                "location": self.challengee_location
-            },
             "challengeid": self.challengeid,
             "status": self.status,
             "challenge_sent_time": self.challenge_sent_time.strftime("%m/%d/%Y, %H:%M:%S"),
-            "challenge_completed_time": self.challenge_completed_time
+            "challenge_completed_time": self.challenge_completed_time,
+            "challenge_step": self.challenge_step,
+            "combat_step": self.combat_step,
+            "challenger": {
+                "dragonname": challenger["name"],
+                "id": self.challenger_dragonid,
+                "latter_position": challenger["latter_position"],
+                "ownerid": self.challenger_ownerid,
+                "location": self.challenger_location,
+                "life": self.challenger_life,
+                "max_life": self.challenger_max_life,
+                "essence": self.challenger_essence,
+                "max_essence": self.challenger_max_essence,
+                "active_turn": self.challenger_active_turn,
+                "status_effects": self.status_effects,
+                "combat_dice": self.challenger_combat_dice,
+                "speed": self.challenger_speed,
+                "attack": self.challenger_attack,
+                "defense": self.challenger_defense,
+                "intellect": self.challenger_intellect,
+                "will": self.challenger_will,
+                "body": self.challenger_body,
+                "resist": self.challenger_resist,
+                "skills": self.challenger_skills,
+                "spells": self.challenger_spells,
+                "abilities": self.challenger_abilities
+            },
+            "challengee": {
+                "dragonname": challengee["name"],
+                "id": self.challengee_dragonid,
+                "latter_position": challengee["latter_position"],
+                "ownerid": self.challengee_ownerid,
+                "location": self.challengee_location,
+                "life": self.challengee_life,
+                "max_life": self.challengee_max_life,
+                "essence": self.challengee_essence,
+                "max_essence": self.challengee_max_essence,
+                "active_turn": self.challengee_active_turn,
+                "status_effects": self.status_effects,
+                "combat_dice": self.challengee_combat_dice,
+                "speed": self.challengee_speed,
+                "attack": self.challengee_attack,
+                "defense": self.challengee_defense,
+                "intellect": self.challengee_intellect,
+                "will": self.challengee_will,
+                "body": self.challengee_body,
+                "resist": self.challengee_resist,
+                "skills": self.challengee_skills,
+                "spells": self.challengee_spells,
+                "abilities": self.challengee_abilities
+
+
+            }
+
         }
         self.challengejson = json.dumps(self.challenge)
 
