@@ -1,4 +1,5 @@
 debug = False
+import random
 
 def clear_screen():
     import os
@@ -349,3 +350,193 @@ brown_dragons_fname = [
     "Cave",
     "Valley",
 ]
+
+#dragon descriptions
+yanthas_description = "Where there is sorrow, I will be the tears of anguish. Where there is fear, I will breed nightmares. Where there is betrayal, I will be your hate. Where there is death, I will sustain it. The time Draws near, and I will consume all."
+
+def generate_character_description(tone):
+
+    sub_plans = {
+        "ominous": {
+            "plans1": [
+                "I shall",
+                "My flames will",
+                "I will",
+                "The darkness shall",
+                "With vengeance, I shall",
+                "I swear to",
+                "I'm destined to",
+                "My purpose is to",
+                "With dread, I shall",
+                "In the name of darkness, I will"
+            ],
+            "plans2": [
+                "unleash chaos upon the world,",
+                "scorch the earth,",
+                "enslave all who oppose me,",
+                "rise from the depths of darkness,",
+                "consume all in my path,",
+                "bring forth the end of days,",
+                "awaken the horrors of the abyss,",
+                "plunge the world into eternal night,",
+                "usher in an era of suffering,",
+                "make the world a living nightmare,"
+            ]
+        },
+        "friendly": {
+            "plans1": [
+                "I aim to",
+                "My purpose is to",
+                "I will",
+                "With kindness as my guide, I shall",
+                "In the spirit of friendship, I will",
+                "My mission is to",
+                "I'm dedicated to",
+                "I shall be a source of",
+                "With a heart full of compassion, I will",
+                "I vow to"
+            ],
+            "plans2": [
+                "protect the realms,",
+                "shelter those in need,",
+                "foster peace and unity,",
+                "share the wisdom of the ages,",
+                "spread love and joy,",
+                "inspire greatness in others,",
+                "nurture the bonds of friendship,",
+                "bring harmony to all lands,",
+                "ignite the flames of hope,",
+                "make the world a better place,"
+            ]
+        },
+        "neutral": {
+            "plans1": [
+                "I seek to",
+                "My goal is to",
+                "I will",
+                "With curiosity as my driving force, I shall",
+                "In pursuit of knowledge, I will",
+                "I'm committed to",
+                "I shall be a catalyst for",
+                "I aim to find",
+                "With a thirst for wisdom, I will",
+                "I vow to"
+            ],
+            "plans2": [
+                "understand the mysteries of existence,",
+                "light the path forward,",
+                "strive for equilibrium in all things,",
+                "adapt to the ever-changing world,",
+                "explore the depths of the unknown,",
+                "embrace the flow of time,",
+                "unlock the secrets of the cosmos,",
+                "maintain balance in all realms,",
+                "seek enlightenment and truth,",
+                "unravel the fabric of reality,"
+            ]
+        }
+    }
+    sub_ambitions = {
+        "ominous": {
+            "ambitions1": [
+                "to conquer",
+                "to dominate",
+                "to plunge",
+                "to engulf",
+                "to subjugate",
+                "to annihilate",
+                "to obliterate",
+                "to shroud",
+                "to devour",
+                "to reign supreme over"
+            ],
+            "ambitions2": [
+                "all lands and skies.",
+                "all in darkness.",
+                "the world into despair.",
+                "everything in chaos.",
+                "all in eternal darkness.",
+                "the world in everlasting dread.",
+                "the world in unending suffering.",
+                "the world in an abyss of torment.",
+                "the world in a veil of shadows.",
+                "all in a never-ending nightmare."
+            ]
+        },
+        "friendly": {
+            "ambitions1": [
+                "to create",
+                "to nurture",
+                "to spread",
+                "to inspire",
+                "to cultivate",
+                "to foster",
+                "to ignite",
+                "to share",
+                "to radiate",
+                "to bring"
+            ],
+            "ambitions2": [
+                "a harmonious world.",
+                "kindness and love.",
+                "joy and unity.",
+                "greatness in others.",
+                "a haven of happiness.",
+                "positivity and goodwill.",
+                "laughter and camaraderie.",
+                "compassion and empathy.",
+                "a world filled with smiles.",
+                "light to dispel the darkness."
+            ]
+        },
+        "neutral": {
+            "ambitions1": [
+                "to unravel",
+                "to share",
+                "to maintain",
+                "to adapt to",
+                "to explore",
+                "to facilitate",
+                "to observe",
+                "to harmonize",
+                "to discover",
+                "to guide"
+            ],
+            "ambitions2": [
+                "the secrets of the universe.",
+                "the wisdom of discovery.",
+                "balance in all realms.",
+                "the ever-changing world.",
+                "the frontiers of knowledge.",
+                "innovation and progress.",
+                "the rhythms of existence.",
+                "the beauty of adaptation.",
+                "the wonders of growth.",
+                "the intricate dance of life."
+            ]
+        }
+    }    
+    
+    if tone in sub_plans and tone in sub_ambitions:
+        plans1 = random.choice(sub_plans[tone]["plans1"])
+        plans2 = random.choice(sub_plans[tone]["plans2"])
+        ambitions1 = random.choice(sub_ambitions[tone]["ambitions1"])
+        ambitions2 = random.choice(sub_ambitions[tone]["ambitions2"])
+        description = f"{plans1} {plans2} {ambitions1} {ambitions2}"
+    else:
+        description = "Invalid tone. Please choose 'ominous', 'friendly', or 'neutral'."
+
+    return description
+
+def random_tone(breed):
+    if breed == "Red":
+        tone = random.choice(["ominous", "ominous", "ominous", "ominous", "friendly", "neutral"])
+    elif breed == "Blue":
+        tone = random.choice(["friendly", "friendly", "friendly", "friendly", "ominous", "neutral"])
+    elif breed == "Silver":
+        tone = random.choice(["neutral", "neutral", "neutral", "ominous","friendly", "friendly"])
+    elif breed == "Brown":
+        tone = random.choice(["neutral", "neutral", "neutral", "ominous", "ominous", "friendly"])
+    else:
+        tone = "neutral"
+    return tone

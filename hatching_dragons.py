@@ -51,6 +51,20 @@ class HatchDragon:
         self.ownerid = userid
         # set the dragon's latter position to by reading the json file
         self.latter_position = self.read_json() + 1 
+
+        # if owner is cpu and latter position is 1 set name to Yanthas, set breed to Red and set description to config.yanthas_description
+        if self.ownerid == 'cpu': 
+            if self.latter_position == 1:
+
+                self.name = "Yanthas"
+                self.breed = "Red"
+                self.description = config.yanthas_description
+                self.tone = 'ominous'
+            else:
+                self.tone = config.random_tone(self.breed)
+                self.description = config.generate_character_description(self.tone)
+
+
         self.id = self.read_json() + 1
         
         #every dragon starts with these same starting scores
@@ -182,59 +196,8 @@ class HatchDragon:
 
         
     def cpu_buff(self):
-        # if the owner is cpu and the latter posisistion is within the top 20, increase the number of wins and losses to represent the dragons fighting history
-        # the lower the position number, the more wins the dragon has   
-        # lets assume postistion 1 has 200 wins and 0 losses        
-        if self.ownerid == 'cpu':
-            if self.latter_position == 1:
-                self.wins = 200
-                self.losses = 200-self.wins
-            if self.latter_position >= 2:
-                self.wins = random.randint(150,175)
-                self.losses = 200-self.wins
-            if self.latter_position >= 3:
-                self.wins = random.randint(125,150)
-                self.losses = 200-self.wins
-            if self.latter_position >= 6:
-                self.wins = random.randint(100,125)
-                self.losses = 125-self.wins
-            if self.latter_position >= 10:
-                self.wins = random.randint(75,100)
-                self.losses = 100-self.wins
-            if self.latter_position >= 15:
-                self.wins = random.randint(50,75)
-                self.losses = 75-self.wins
-            if self.latter_position >= 20:
-                self.wins = random.randint(25,50)
-                self.losses = 50-self.wins
-            if self.latter_position >= 30:
-                self.wins = random.randint(15,25)
-                self.losses = 25-self.wins
-            if self.latter_position >= 40:
-                self.wins = random.randint(10,15)
-                self.losses = 15-self.wins
-            if self.latter_position >= 50:
-                self.wins = random.randint(0,15)
-                self.losses = 10-self.wins
-            if self.latter_position > 50:
-                self.wins = random.randint(0,5)
-                self.losses = 5-self.wins
 
 
-
-        # assign starting advances for each win and loss. 
-        # for each win give 0.5 advances and 1.5 favor rounded down
-        # for every 10
-        #  losses give 1 advance rounded down
-        # for every one loss lose 2 favor. favor can not go below zero
-        #  This is to make the cpu dragons more powerful
-        if self.ownerid == 'cpu':
-            self.starting_advances += math.floor(int(self.wins * 0.5))
-            self.favor += math.floor(int(self.wins * .2))
-            self.starting_advances -= math.floor(int(self.losses / 10))
-            self.favor -= int(self.losses * 2)
-            if self.favor < 0:
-                self.favor = 0
 
         # if the owner is cpu and latter position is within the top 20, randomly increase the age. it should get closer to 8 as we move closer to position 1
         if self.ownerid == 'cpu':
@@ -252,6 +215,36 @@ class HatchDragon:
                 self.age = random.randint(7,8)
             if self.latter_position == 1:
                 self.age = random.randint(8,8)
+
+        # if the owner is cpu and the latter posisistion is within the top 20, 
+        # increase the number of wins and losses to represent the dragons fighting history
+        # the higher the age, the more wins the dragon has   
+        # lets assume postistion 1 always has 200 wins and 0 losses        
+        if self.ownerid == 'cpu':
+            if self.latter_position == 1:
+                self.wins = 200
+                self.losses = 200-self.wins
+
+            else:
+                #roll 4 6 sided dice multiply by age to get wins
+                # roll 2 6 sided dice age to get losses
+                self.wins = (random.randint(1,6) + random.randint(1,6) + random.randint(1,6) + random.randint(1,6)) * self.age
+                self.losses = (random.randint(1,6) + random.randint(1,6))
+
+        # assign starting advances for each win and loss. 
+        # for each win give 0.5 advances and 1.5 favor rounded down
+        # for every 10 losses give 1 advance rounded down
+        # for every one loss lose 2 favor. favor can not go below zero
+        #  This is to make the cpu dragons more powerful
+        if self.ownerid == 'cpu':
+            self.starting_advances += math.floor(int(self.wins * 0.5))
+            self.favor += math.floor(int(self.wins * .2))
+            self.starting_advances -= math.floor(int(self.losses / 10))
+            self.favor -= int(self.losses * 2)
+            if self.favor < 0:
+                self.favor = 0                
+
+
     def allocate_points(self):
         
         if self.debug == True:
@@ -865,6 +858,8 @@ class HatchDragon:
             tempdragon["name"] = self.name
             tempdragon["breed"] = self.breed
             tempdragon["age"] = self.age
+            tempdragon["tone"] = self.tone
+            tempdragon["description"] = self.description
             tempdragon["attack"] = self.attack
             tempdragon["defense"] = self.defense
             tempdragon["body"] = self.body
