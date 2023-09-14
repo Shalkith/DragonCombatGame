@@ -25,7 +25,7 @@ class Actions():
             data = json.load(file)
             temp = data["challenges"]
             for i in temp:
-                if i["challenger"]["dragonid"] == self.dragon["id"] or i["challengee"]["dragonid"] == self.dragon["id"]:
+                if i["challenger"]["id"] == self.dragon["id"] or i["challengee"]["id"] == self.dragon["id"]:
                     if i["status"] == "accepted":
                         self.challengeid = i["challengeid"]
                         break
@@ -33,7 +33,7 @@ class Actions():
                 raise ValueError("Dragon not in an active challenge")            
 
         pass
-    def move(self):
+    def move(self,current_location,opponent_location):
         # move the dragon to a new location in combat
         # current location is stored in the challenges.json file
         # valid locations are A, B, C, D, E
@@ -41,33 +41,13 @@ class Actions():
         # the dragon can move to the left if the dragon is not in the A column
         # the dragon can move to the right if the dragon is not in the E column
         # the dragon can move to the left or right if the dragon is in B, C or D columns
+        self.current_location = current_location
+        self.opponent_location = opponent_location
 
+        if config.debug == True:
+            print("Current location: ", self.current_location)
+            print("Opponent location: ", self.opponent_location)
 
-        #get current location from challenges.json file
-        with open(config.challengesjson, "r") as file:
-            data = json.load(file)
-            temp = data["challenges"]
-            for i in temp:
-                if i["challengeid"] == self.challengeid:
-                    if i["challenger"]["dragonid"] == self.dragon["id"]:
-                        self.current_location = i["challenger"]["location"]
-                    elif i["challengee"]["dragonid"] == self.dragon["id"]:
-                        self.current_location = i["challengee"]["location"]
-                        break
-                    break
-        
-        # get the opponents location
-        with open(config.challengesjson, "r") as file:
-            data = json.load(file)
-            temp = data["challenges"]
-            for i in temp:
-                if i["challengeid"] == self.challengeid:
-                    if i["challenger"]["dragonid"] != self.dragon["id"]:
-                        self.opponent_location = i["challenger"]["location"]
-                    elif i["challengee"]["dragonid"] != self.dragon["id"]:
-                        self.opponent_location = i["challengee"]["location"]
-                        break
-                    break
 
         # if the ownerid is cpu, the dragon will move towards the other dragon
         if self.dragon["ownerid"] == "cpu":
@@ -115,19 +95,11 @@ class Actions():
             elif self.current_location_int == 5:
                 self.current_location = "E"
             #update the challenges.json file with the new location
-            with open(config.challengesjson, "r") as file:
-                data = json.load(file)
-                temp = data["challenges"]
-                for i in temp:
-                    if i["challengeid"] == self.challengeid:
-                        if i["challenger"]["dragonid"] == self.dragon["id"]:
-                            i["challenger"]["location"] = self.current_location
-                        elif i["challengee"]["dragonid"] == self.dragon["id"]:
-                            i["challengee"]["location"] = self.current_location
-                            break
-                        break
-            with open(config.challengesjson, "w") as file:
-                json.dump(data, file, indent=4)
+
+            if config.debug == True:
+                print("New location: ", self.current_location)
+            
+            return self.current_location
                 
                    
         else:
