@@ -1,3 +1,44 @@
 {
-    "dragons": []
+    "dragons": [
+        {
+            "id": 1,
+            "ownerid": "cpu",
+            "name": "Yanthas",
+            "breed": "Red",
+            "age": 8,
+            "tone": "ominous",
+            "description": "Where there is sorrow, I will be the tears of anguish. Where there is fear, I will breed nightmares. Where there is betrayal, I will be your hate. Where there is death, I will sustain it. The time Draws near, and I will consume all.",
+            "attack": 15,
+            "defense": 10,
+            "body": 11,
+            "intellect": 10,
+            "will": 10,
+            "resist": 10,
+            "speed": 10,
+            "discipline": 5,
+            "life": 21,
+            "essence": 15,
+            "skills": {
+                "claw_attack": 4,
+                "tail_bash": 4,
+                "flame_tongue": 5,
+                "double_slash": 4,
+                "molten_horns": 4,
+                "fire_breath": 4,
+                "tail_blaze": 5,
+                "ember_wings": 4,
+                "absoulte_rend": 5,
+                "bezerker_rage": 4
+            },
+            "spells": {},
+            "abilities": {
+                "heal": 0
+            },
+            "development_points": 0,
+            "favor": 40,
+            "wins": 200,
+            "losses": 0,
+            "latter_position": 1
+        }
+    ]
 }
