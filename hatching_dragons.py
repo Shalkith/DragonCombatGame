@@ -85,11 +85,16 @@ class HatchDragon:
 
 
 
-        #create lists to hold the dragon's abilitys spells and skills
+        #create lists to hold the dragon's abilities spells and skills
 
-        self.abilitys = []
+        self.abilities = []
         self.spells = []
         self.skills = []
+
+        self.abilities_dict = {}
+        self.spells_dict = {}
+        self.skills_dict = {}
+
 
         # set the starting stats based on breed - these are improvement_cost,Aging_cost,starting_advances,Claw Attack (this is a skill),essence and life
         # create a dictionary to hold the breed's stats
@@ -111,16 +116,16 @@ class HatchDragon:
         self.ceiling_essence = self.stats_ceilings["ceiling_essence"]
         
 
-    def assign_skills_spells_abilitys(self):
-        # assign skills spells and abilitys based on breed and age
-        # use self.age to determine what skills spells and abilitys the dragon has access to
-        # use self.breed to determine what skills spells and abilitys the dragon has access to
-        # use self.skills, self.spells, and self.abilitys to store the skills spells and abilitys the dragon has access to
+    def assign_skills_spells_abilities(self):
+        # assign skills spells and abilities based on breed and age
+        # use self.age to determine what skills spells and abilities the dragon has access to
+        # use self.breed to determine what skills spells and abilities the dragon has access to
+        # use self.skills, self.spells, and self.abilities to store the skills spells and abilities the dragon has access to
 
-        # use config.breed_abilities[self.breed] to determine what skills spells and abilitys the dragon has access to
+        # use config.breed_abilities[self.breed] to determine what skills spells and abilities the dragon has access to
         # use config.breed_abilities[self.breed]["skills"] to determine what skills the dragon has access to
         # use config.breed_abilities[self.breed]["spells"] to determine what spells the dragon has access to
-        # use config.breed_abilities[self.breed]["abilitys"] to determine what abilitys the dragon has access to
+        # use config.breed_abilities[self.breed]["abilities"] to determine what abilities the dragon has access to
 
         # each of these has a minimum age, if the dragon's age is less than the minimum age, the dragon does not have access to the skill
         # if the dragon's age is greater than or equal to the minimum age, the dragon has access to the skill
@@ -134,17 +139,19 @@ class HatchDragon:
                 self.spells.append(spell)
         for ability in config.breed_abilities[self.breed]["abilities"]:
             if self.age >= config.breed_abilities[self.breed]["abilities"][ability]["minimum_age"]:
-                self.abilitys.append(ability)
+                self.abilities.append(ability)
 
-        # create an attribute for each of the skills, spells and abilitys and set it to 0
+        # create an attribute for each of the skills, spells and abilities and set it to 0
         # except tail bash which is equal to body and claw attack which is equal to 1
+
+        
 
 
         for skill in self.skills:
             setattr(self, skill, 0)
         for spell in self.spells:
             setattr(self, spell, 0)
-        for ability in self.abilitys:
+        for ability in self.abilities:
             setattr(self, ability, 0)
 
         # set tail bash to equal body
@@ -152,6 +159,19 @@ class HatchDragon:
         # set claw attack to equal 1
         self.claw_attack = 1
 
+
+        for skill in config.breed_abilities[self.breed]["skills"]:
+            if self.age >= config.breed_abilities[self.breed]["skills"][skill]["minimum_age"]:
+                # add the skill to the self.skills dict and set value to starting_value
+                self.skills_dict[skill] = config.breed_abilities[self.breed]["skills"][skill]["starting_value"]
+        for spell in config.breed_abilities[self.breed]["spells"]:
+            if self.age >= config.breed_abilities[self.breed]["spells"][spell]["minimum_age"]:
+                # add the spell to the self.spells dict and set value to starting_value
+                self.spells_dict[spell] = config.breed_abilities[self.breed]["spells"][spell]["starting_value"]
+        for ability in config.breed_abilities[self.breed]["abilities"]:
+            if self.age >= config.breed_abilities[self.breed]["abilities"][ability]["minimum_age"]:
+                # add the ability to the self.abilities dict and set value to starting_value
+                self.abilities_dict[ability] = config.breed_abilities[self.breed]["abilities"][ability]["starting_value"]
 
 
 
@@ -255,7 +275,7 @@ class HatchDragon:
             print("tail bash: " + str(self.tail_bash))
             print("skills: " + str(self.skills))
             print("spells: " + str(self.spells))
-            print("abilitys: " + str(self.abilitys))
+            print("abilities: " + str(self.abilities))
             print("development points: " + str(self.development_points))
             print("favor: " + str(self.favor))
             print()
@@ -311,6 +331,14 @@ class HatchDragon:
 
                 # advance the attribute by 1
                 setattr(self, attribute, getattr(self, attribute) + 1)
+                # if the attrubite is a skill spell or ability, add it to the appropriate dict
+                if attribute in self.skills:
+                    self.skills_dict[attribute] = getattr(self, attribute)
+                if attribute in self.spells:
+                    self.spells_dict[attribute] = getattr(self, attribute)
+                if attribute in self.abilities:
+                    self.abilities_dict[attribute] = getattr(self, attribute)
+
                 if self.debug == True:
                     print(attribute+" advanced by 1")
                     print(attribute+" new value: " + str(getattr(self, attribute)))
@@ -403,6 +431,10 @@ class HatchDragon:
                 #check and see if tail bash is above body, if so, set tail bash to body
                 if self.tail_bash > self.body:
                     self.tail_bash = self.body
+                #set tailbash in dict to body
+                self.skills_dict["tail_bash"] = self.body
+
+            
 
                 #print stats after allocating points if debug is set to true
                 if self.debug == True:
@@ -426,7 +458,7 @@ class HatchDragon:
                     print("tail bash: " + str(self.tail_bash))
                     print("skills: " + str(self.skills))
                     print("spells: " + str(self.spells))
-                    print("abilitys: " + str(self.abilitys))
+                    print("abilities: " + str(self.abilities))
                     print("development points: " + str(self.development_points))
                     print("favor: " + str(self.favor))
                     print()
@@ -496,7 +528,7 @@ class HatchDragon:
                 print("tail bash: " + str(self.tail_bash))
                 print("skills: " + str(self.skills))
                 print("spells: " + str(self.spells))
-                print("abilitys: " + str(self.abilitys))
+                print("abilities: " + str(self.abilities))
                 print("development points: " + str(self.development_points))
                 print("favor: " + str(self.favor))
                 print()
@@ -511,12 +543,12 @@ class HatchDragon:
             # if the owner is not cpu, ask the user to enter the dragon's stats
             if self.ownerid == 'cpu':
                 self.cpu_buff()
-                self.assign_skills_spells_abilitys()
+                self.assign_skills_spells_abilities()
                 self.allocate_points()
                 self.advance_age()
                 
             else:
-                self.assign_skills_spells_abilitys()
+                self.assign_skills_spells_abilities()
                 while True:
 
 
@@ -772,7 +804,7 @@ class HatchDragon:
                     print("tail bash: " + str(temptail_bash))
                     print("skills: " + str(self.skills))
                     print("spells: " + str(self.spells))
-                    print("abilitys: " + str(self.abilitys))
+                    print("abilities: " + str(self.abilities))
                     print("development points: " + str(self.development_points))
                     print("favor: " + str(self.favor))
                     print()
@@ -790,6 +822,17 @@ class HatchDragon:
                         self.essence = tempessence
                         self.claw_attack = tempclaw_attack
                         self.tail_bash = temptail_bash
+                        # update the skills ability and spells dicts
+                        for skill in self.skills:
+                            if skill != "tail_bash":
+                                self.skills_dict[skill] = getattr(self, skill)
+                        for spell in self.spells:
+                            self.spells_dict[spell] = getattr(self, spell)
+                        for ability in self.abilities:
+                            self.abilities_dict[ability] = getattr(self, ability)
+                        # set tailbash in dict to body
+                        self.skills_dict["tail_bash"] = self.body
+                        
                         break
                     else:
                         continue
@@ -832,17 +875,9 @@ class HatchDragon:
             tempdragon["discipline"] = self.discipline
             tempdragon["life"] = self.life
             tempdragon["essence"] = self.essence
-
-            for skill in self.skills:
-                tempdragon[skill] = getattr(self, skill)
-            for spell in self.spells:
-                tempdragon[spell] = getattr(self, spell)
-            for ability in self.abilitys:
-                tempdragon[ability] = getattr(self, ability)
-
-            tempdragon["skills"] = self.skills
-            tempdragon["spells"] = self.spells
-            tempdragon["abilitys"] = self.abilitys
+            tempdragon["skills"] = self.skills_dict
+            tempdragon["spells"] = self.spells_dict
+            tempdragon["abilities"] = self.abilities_dict
             tempdragon["development_points"] = self.development_points
             tempdragon["favor"] = self.favor
             tempdragon["wins"] = self.wins
@@ -878,7 +913,7 @@ class HatchDragon:
         print("Tail Bash: " + str(self.tail_bash))
         print("Skills: " + str(self.skills))
         print("Spells: " + str(self.spells))
-        print("Abilitys: " + str(self.abilitys))
+        print("abilities: " + str(self.abilities))
 
 def random_name(breed):
     #generate a function to create a random name - the name should sound like a dragon name
