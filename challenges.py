@@ -148,7 +148,7 @@ class Challenge:
             "challenge_step": self.challenge_step,
             "combat_step": self.combat_step,
             "challenger": {
-                "dragonname": challenger["name"],
+                "name": challenger["name"],
                 "id": self.challenger_dragonid,
                 "latter_position": challenger["latter_position"],
                 "ownerid": self.challenger_ownerid,
@@ -172,7 +172,7 @@ class Challenge:
                 "abilities": self.challenger_abilities
             },
             "challengee": {
-                "dragonname": challengee["name"],
+                "name": challengee["name"],
                 "id": self.challengee_dragonid,
                 "latter_position": challengee["latter_position"],
                 "ownerid": self.challengee_ownerid,
