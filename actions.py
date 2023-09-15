@@ -2,6 +2,7 @@
 # create a class that will contain actions a dragon can take during combat
 import json 
 import config
+import random
 
 class Actions():
 
@@ -34,6 +35,7 @@ class Actions():
 
         pass
     def move(self,current_location,opponent_location):
+
         # move the dragon to a new location in combat
         # current location is stored in the challenges.json file
         # valid locations are A, B, C, D, E
@@ -111,7 +113,121 @@ class Actions():
             # if the dragon is in a column to the left of the other dragon, the dragon will move right
             # if the dragon is in a column to the right of the other dragon, the dragon will move left
             pass
+    def use(self,movetype,move,cost,attacker,defender):
 
+        #get the attacker breed from dragon.json
+
+        with open(config.dragonjson, "r") as file:
+            data = json.load(file)
+            temp = data["dragons"]
+            for i in temp:
+                if i["id"] == attacker["id"]:
+                    attackerbreed = i["breed"]
+                    break
+            else:
+                raise ValueError("Dragon not found")
+
+
+        # attacker rolls its combat dice:
+        # roll a d6 equal to number of dice
+        attackerresult = 0 
+        for r in range(attacker["combat_dice"]):
+            attackerresult += random.randint(1,6)
+        # defender rolls its combat dice:
+        # roll a d6 equal to number of dice
+        defenderresult = 0
+        for r in range(defender["combat_dice"]):
+            defenderresult += random.randint(1,6)
+        
+        # if the movetype is a skill, the attacker add its attack value to the result
+        # if the movetype is a skill, the defender add its defense value to the result
+        if movetype == "skill":
+            attackerresult += attacker["attack"]
+            defenderresult += defender["defense"]
+        # if the movetype is a spell, the attacker add its intellect value to the result
+        # if the movetype is a spell, the defender add its will value to the result
+        elif movetype == "spell":
+            attackerresult += attacker["intellect"]
+            defenderresult += defender["will"]
+
+        # if the attackerresult is greater than the defenderresult, the attack is successful
+        # if the attackerresult is less than the defenderresult, the attack is unsuccessful
+        # if the attackerresult is equal to the defenderresult, the attack is unsuccessful
+        if attackerresult > defenderresult:
+            result = "successful"
+            max_damage = 0
+            #get the rating for the moved used from attacker object
+            if movetype == "skill":
+                rating = attacker["skills"][move]
+            elif movetype == "spell":
+                rating = attacker["spells"][move]
+
+            #get the damage code from the config.breed_abilities
+
+            # get attackers skill or spell rating based on movetype and move
+            rating = attacker[movetype][move]
+            #             
+            damage_code = config.breed_abilities[attackerbreed][movetype][move]["damage_code"]
+            if config.debug == True:
+                print("Damage code: ",damage_code)
+                print("Rating: ",rating)
+
+            #get the damagechart from damage_chart.json
+            #get  dice and bonus from damagechart
+            with open(config.damagechartjson, "r") as file:
+                data = json.load(file)
+                temprating = rating
+                if temprating > 20:
+                    temprating = 20
+                dice = data[damage_code][str(rating)]["dice"]
+                bonus = data[damage_code][str(rating)]["bonus"]
+
+            #roll the dice            
+            damage = self.roll_dice(dice)
+            #add the bonus
+            max_damage = damage + bonus
+            
+        
+        else:
+            result = "unsuccessful"
+            max_damage = 0
+            cost = cost//2
+            if cost < 1:
+                cost = 1
+        return result,max_damage,cost
+
+    def roll_dice(self,dice):
+        rule_of_6 = 0
+        rolls = []
+        damage = 0
+
+        for r in range(dice):
+            roll = random.randint(1,6)
+            if roll == 6:
+                rule_of_6 += 1
+            if roll == 1:
+                rule_of_6 -= 1
+            rolls.append(roll)
+            damage += roll
+        if config.debug == True:
+            print("Rolled: ",rolls)
+        #if the rule of 6 is greater than 0, roll the dice again for each number above zero
+        while rule_of_6 > 0:
+            rolls = []
+            rerolls = rule_of_6 
+            rule_of_6 = 0
+            for r in range(rerolls):
+                roll = random.randint(1,6)
+                rolls.append(roll)
+                if roll == 6:
+                    rule_of_6 += 1
+                if roll == 1:
+                    rule_of_6 -= 1
+                damage += roll
+            if config.debug == True:    
+                print("Rule of 6 rolls: ",rolls)
+        return damage
+          
 
 
 
@@ -122,6 +238,6 @@ class Actions():
 
 # test the Actions class
 if __name__ == "__main__":
-    test = Actions(47)
+    test = Actions(74)
     print(test.dragon)
-    test.move()
+    test.roll_dice(1)
