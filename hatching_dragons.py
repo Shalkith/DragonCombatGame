@@ -187,14 +187,6 @@ class HatchDragon:
                 # add the ability to the self.abilities dict and set value to starting_value
                 self.abilities_dict[ability] = config.breed_abilities[self.breed]["abilities"][ability]["starting_value"]
 
-
-
-
-
-
-
-
-        
     def cpu_buff(self):
 
 
@@ -238,6 +230,8 @@ class HatchDragon:
         #  This is to make the cpu dragons more powerful
         if self.ownerid == 'cpu':
             self.starting_advances += math.floor(int(self.wins * 0.5))
+            if self.latter_position == 1 and self.name == "Yanthas":
+                self.starting_advances = 178 # Yanthas has 178 starting advances to max his stats
             self.favor += math.floor(int(self.wins * .2))
             self.starting_advances -= math.floor(int(self.losses / 10))
             self.favor -= int(self.losses * 2)
@@ -342,6 +336,10 @@ class HatchDragon:
                 if attribute == "body":
                     self.tail_bash = self.body
                 spent_points += 1
+                #set taibash in dict to body
+                self.skills_dict["tail_bash"] = self.body
+
+
                 # if all points are not spent, start over
                 if spent_points != self.starting_advances:
                     if self.debug == True:
@@ -499,6 +497,9 @@ class HatchDragon:
                     self.essence = self.ceiling_essence
                 if self.tail_bash > self.body:
                     self.tail_bash = self.body
+                #set tailbash in dict to body
+                self.skills_dict["tail_bash"] = self.body
+
             #print final stats if debug is set to true
             if self.debug == True:
                 print("This is what the Dragon looks like after advancing age")
@@ -906,9 +907,9 @@ class HatchDragon:
         print("Owner ID: " + str(self.ownerid))
         print("Claw Attack: " + str(self.claw_attack))
         print("Tail Bash: " + str(self.tail_bash))
-        print("Skills: " + str(self.skills))
-        print("Spells: " + str(self.spells))
-        print("abilities: " + str(self.abilities))
+        print("Skills: " + str(self.skills_dict))
+        print("Spells: " + str(self.spells_dict))
+        print("abilities: " + str(self.abilities_dict))
 
 def random_name(breed):
     #generate a function to create a random name - the name should sound like a dragon name
