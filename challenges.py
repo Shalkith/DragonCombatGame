@@ -112,6 +112,7 @@ class Challenge:
                     self.challenger_skills = i["skills"]
                     self.challenger_spells = i["spells"]
                     self.challenger_abilities = i["abilities"]
+                    self.challenger_breed = i["breed"] 
 
                     
                 elif i["id"] == self.challengee_dragonid:
@@ -130,6 +131,7 @@ class Challenge:
                     self.challengee_skills = i["skills"]
                     self.challengee_spells = i["spells"]
                     self.challengee_abilities = i["abilities"]
+                    self.challengee_breed = i["breed"]
 
 
 
@@ -147,8 +149,10 @@ class Challenge:
             "challenge_completed_time": self.challenge_completed_time,
             "challenge_step": self.challenge_step,
             "combat_step": self.combat_step,
+            "rounds": 0,
             "challenger": {
                 "name": challenger["name"],
+                "breed": self.challenger_breed,
                 "id": self.challenger_dragonid,
                 "latter_position": challenger["latter_position"],
                 "ownerid": self.challenger_ownerid,
@@ -173,6 +177,7 @@ class Challenge:
             },
             "challengee": {
                 "name": challengee["name"],
+                "breed": self.challengee_breed,
                 "id": self.challengee_dragonid,
                 "latter_position": challengee["latter_position"],
                 "ownerid": self.challengee_ownerid,
