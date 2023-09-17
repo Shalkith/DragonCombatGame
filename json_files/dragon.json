@@ -26,19 +26,181 @@
                 "molten_horns": 5,
                 "fire_breath": 5,
                 "tail_blaze": 5,
-                "ember_wings": 5,
                 "absoulte_rend": 5,
                 "bezerker_rage": 5
             },
-            "spells": {},
+            "spells": {
+                "ember_wings": 5
+            },
             "abilities": {
                 "heal": 0
             },
-            "development_points": 0,
-            "favor": 40,
-            "wins": 200,
-            "losses": 0,
+            "development_points": 738,
+            "favor": 215,
+            "wins": 295,
+            "losses": 3,
             "latter_position": 1
+        },
+        {
+            "id": 2,
+            "ownerid": "cpu",
+            "name": "Whisper Marinecrest",
+            "breed": "Blue",
+            "age": 7,
+            "tone": "friendly",
+            "description": "My mission is to spread love and joy, to ignite compassion and empathy.",
+            "attack": 10,
+            "defense": 11,
+            "body": 10,
+            "intellect": 10,
+            "will": 10,
+            "resist": 12,
+            "speed": 8,
+            "discipline": 10,
+            "life": 17,
+            "essence": 15,
+            "skills": {
+                "claw_attack": 2,
+                "tail_bash": 10,
+                "bitter_chomp": 1,
+                "seaweed_mane": 2,
+                "tail_slash": 0,
+                "poison_breath": 2,
+                "whirlpool_eyes": 1
+            },
+            "spells": {
+                "body_of_water": 2,
+                "oceans_embace": 2
+            },
+            "abilities": {
+                "heal": 0
+            },
+            "development_points": 344,
+            "favor": 0,
+            "wins": 146,
+            "losses": 85,
+            "latter_position": 5
+        },
+        {
+            "id": 3,
+            "ownerid": "cpu",
+            "name": "Crumble Rockyshield",
+            "breed": "Brown",
+            "age": 7,
+            "tone": "neutral",
+            "description": "With a thirst for wisdom, I will light the path forward, to explore the rhythms of existence.",
+            "attack": 11,
+            "defense": 8,
+            "body": 14,
+            "intellect": 7,
+            "will": 10,
+            "resist": 10,
+            "speed": 5,
+            "discipline": 10,
+            "life": 17,
+            "essence": 12,
+            "skills": {
+                "claw_attack": 3,
+                "tail_bash": 14,
+                "mud_slide": 3,
+                "yummy_rock_suprise": 3,
+                "battering_ram": 2
+            },
+            "spells": {
+                "earths_protection": 2,
+                "petrify": 2,
+                "wrath_of_earth": 3
+            },
+            "abilities": {
+                "heal": 0,
+                "stones_touch": 0
+            },
+            "development_points": 418,
+            "favor": 2,
+            "wins": 159,
+            "losses": 85,
+            "latter_position": 3
+        },
+        {
+            "id": 4,
+            "ownerid": "cpu",
+            "name": "Hill Quakemaw",
+            "breed": "Brown",
+            "age": 7,
+            "tone": "friendly",
+            "description": "With a heart full of compassion, I will spread love and joy, to create kindness and love.",
+            "attack": 15,
+            "defense": 10,
+            "body": 8,
+            "intellect": 10,
+            "will": 14,
+            "resist": 9,
+            "speed": 5,
+            "discipline": 10,
+            "life": 14,
+            "essence": 9,
+            "skills": {
+                "claw_attack": 2,
+                "tail_bash": 8,
+                "mud_slide": 2,
+                "yummy_rock_suprise": 0,
+                "battering_ram": 1
+            },
+            "spells": {
+                "earths_protection": 2,
+                "petrify": 3,
+                "wrath_of_earth": 1
+            },
+            "abilities": {
+                "heal": 0,
+                "stones_touch": 0
+            },
+            "development_points": 217,
+            "favor": 0,
+            "wins": 111,
+            "losses": 116,
+            "latter_position": 4
+        },
+        {
+            "id": 5,
+            "ownerid": "cpu",
+            "name": "Frost Celestialight",
+            "breed": "Silver",
+            "age": 8,
+            "tone": "neutral",
+            "description": "I will explore the depths of the unknown, to maintain the wisdom of discovery.",
+            "attack": 5,
+            "defense": 13,
+            "body": 5,
+            "intellect": 14,
+            "will": 13,
+            "resist": 13,
+            "speed": 11,
+            "discipline": 12,
+            "life": 16,
+            "essence": 14,
+            "skills": {
+                "claw_attack": 5,
+                "tail_bash": 5,
+                "lightning_breath": 3
+            },
+            "spells": {
+                "refreshing_winds": 2,
+                "wings_of_air": 5,
+                "maddening_winds": 4,
+                "tornado": 1,
+                "vapors_kiss": 2,
+                "gapsp_for_air": 3,
+                "silence": 4
+            },
+            "abilities": {
+                "heal": 0
+            },
+            "development_points": 844,
+            "favor": 171,
+            "wins": 259,
+            "losses": 33,
+            "latter_position": 2
         }
     ]
 }
