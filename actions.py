@@ -6,7 +6,9 @@ import random
 
 class Actions():
 
-    def __init__(self,dragonid):
+    def __init__(self,dragon):
+        dragonid = dragon["id"]
+        
         #open the dragon.json file and read the data
         #find the dragon with the dragonid
         #set the dragon's data to self
@@ -113,6 +115,8 @@ class Actions():
             # if the dragon is in a column to the left of the other dragon, the dragon will move right
             # if the dragon is in a column to the right of the other dragon, the dragon will move left
             pass
+
+
     def use(self,movetype,move,cost,attacker,defender):
 
         #get the attacker breed from dragon.json
@@ -130,25 +134,61 @@ class Actions():
 
         # attacker rolls its combat dice:
         # roll a d6 equal to number of dice
-        attackerresult = 0 
-        for r in range(attacker["combat_dice"]):
-            attackerresult += random.randint(1,6)
+        attackerresult = 0
+        
+        roll,roll_log = self.roll_dice(dice=attacker["combat_dice"],bonusdice=attacker["attack_die_bonus"],adjustment=attacker["roll_adjustment"],dragon=attacker) 
+        if config.debug == True:
+            print()
+            print(
+                "Attacker: ",attacker["name"], "is using ",move,". Against ",defender["name"])
+            print(roll_log)
+        attackerresult += roll
+        # if the movetype is a skill, the attacker add its attack value to the result
+        if movetype == "skill":
+            attackerresult += attacker["attack"]
+            if config.debug == True:
+                print("Attack value: ",attacker["attack"])
+        
+        # if the movetype is a spell, the attacker add its intellect value to the result
+        elif movetype == "spell":
+            attackerresult += attacker["intellect"]
+            if config.debug == True:
+                print("Intellect value: ",attacker["intellect"])
+        if config.debug == True:
+            print(attacker["name"], "rolled: ",attackerresult)
+        
+
+
+
         # defender rolls its combat dice:
         # roll a d6 equal to number of dice
         defenderresult = 0
-        for r in range(defender["combat_dice"]):
-            defenderresult += random.randint(1,6)
-        
-        # if the movetype is a skill, the attacker add its attack value to the result
+        temp_defense_die_bonus =  defender["defense_die_bonus"]
+        if defender["rested_bonus"] == True:
+            defender["rested_bonus"] = False
+            temp_defense_die_bonus = defender["combat_dice"] + 1
+            if config.debug == True:
+                print(defender["name"], "is rested and gets a bonus die")
+        roll,roll_log = self.roll_dice(dice=defender["combat_dice"],bonusdice=temp_defense_die_bonus,adjustment=defender["roll_adjustment"],dragon=defender)
+        if config.debug == True:
+            print(
+                "Defender: ",defender["name"], "is defending against ",attacker["name"],"'s ",move)
+            print(roll_log)
+            print()
+        defenderresult += roll
+                
         # if the movetype is a skill, the defender add its defense value to the result
         if movetype == "skill":
-            attackerresult += attacker["attack"]
             defenderresult += defender["defense"]
-        # if the movetype is a spell, the attacker add its intellect value to the result
+            if config.debug == True:
+                print("Defense value: ",defender["defense"])
         # if the movetype is a spell, the defender add its will value to the result
         elif movetype == "spell":
-            attackerresult += attacker["intellect"]
             defenderresult += defender["will"]
+            if config.debug == True:
+                print("Will value: ",defender["will"])
+        if config.debug == True:
+            print(defender["name"], "rolled: ",defenderresult)
 
         # if the attackerresult is greater than the defenderresult, the attack is successful
         # if the attackerresult is less than the defenderresult, the attack is unsuccessful
@@ -183,7 +223,7 @@ class Actions():
                 bonus = data[damage_code][str(rating)]["bonus"]
 
             #roll the dice            
-            damage = self.roll_dice(dice)
+            damage,roll_log = self.roll_dice(dice,0,attacker["roll_adjustment"],self.dragon)
             #add the bonus
             max_damage = damage + bonus
             
@@ -194,14 +234,17 @@ class Actions():
             cost = cost//2
             if cost < 1:
                 cost = 1
-        return result,max_damage,cost
+        return result,max_damage,cost,roll_log
 
-    def roll_dice(self,dice):
+    def roll_dice(self,dice,bonusdice,adjustment,dragon):
         rule_of_6 = 0
         rolls = []
         damage = 0
+        roll_log = ''
+        roll_log += dragon["name"] + " is rolling " + str(dice) + " dice, " + str(bonusdice) + " bonus dice and has a " + str(adjustment) + " point adjustment "
 
-        for r in range(dice):
+        total_dice = dice + bonusdice   
+        for r in range(total_dice):
             roll = random.randint(1,6)
             if roll == 6:
                 rule_of_6 += 1
@@ -209,6 +252,7 @@ class Actions():
                 rule_of_6 -= 1
             rolls.append(roll)
             damage += roll
+            roll_log += "Rolled: "+ str(roll) + " "
         if config.debug == True:
             print("Rolled: ",rolls)
         #if the rule of 6 is greater than 0, roll the dice again for each number above zero
@@ -226,18 +270,27 @@ class Actions():
                 damage += roll
             if config.debug == True:    
                 print("Rule of 6 rolls: ",rolls)
-        return damage
+            roll_log += "Rule of 6 rolls: " + str(rolls) + " "
+        #add the adjustment
+        damage += adjustment
+        roll_log += str(damage) + " points of damage after adjustment"
+
+        
+        return damage,roll_log
           
-
-
-
-
-
-
-
 
 # test the Actions class
 if __name__ == "__main__":
-    test = Actions(74)
-    print(test.dragon)
-    test.roll_dice(1)
+    #select a random dragon from the dragon.json file
+    with open(config.dragonjson, "r") as file:
+        data = json.load(file)
+        temp = data["dragons"]
+        for dragon in temp:
+            if dragon["id"] == 2:
+                randdragon = random.choice(temp)
+                dragon = dragon
+                break
+    test = Actions(dragon)
+    #print(test.dragon)
+    damage,roll_log = test.roll_dice(1,15,1,dragon)
+    print(roll_log)

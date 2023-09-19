@@ -28,12 +28,108 @@ class Combat:
         self.challenger = self.challenge["challenger"]
         self.challengee = self.challenge["challengee"]
 
-        self.challenger_actions = actions.Actions(self.challenger["id"])
-        self.challengee_actions = actions.Actions(self.challengee["id"])
+        # a Rested dragon get 1 bonus combat die for the next turn
+        self.challenger["rested_bonus"] = False
+        self.challengee["rested_bonus"] = False
+
+        # roll bonus is added to the final result of a roll
+        self.challenger["roll_adjustment"] = 0
+        self.challengee["roll_adjustment"] = 0
+
+        # attack die bonus - are added to the number of dice rolled for attack role
+        self.challenger["attack_die_bonus"] = 0
+        self.challengee["attack_die_bonus"] = 0
+        
+        # defense die bonus - are added to the number of dice rolled for defense role
+        self.challenger["defense_die_bonus"] = 0
+        self.challengee["defense_die_bonus"] = 0
+
+        # essence cost - are subtracted from the cost of skill or spell
+        self.challenger["essence_adjustment"] = 0
+        self.challengee["essence_adjustment"] = 0
+
+        self.challenger_actions = actions.Actions(self.challenger)
+        self.challengee_actions = actions.Actions(self.challengee)
 
         self.challenge["log"] = []
 
+    def assign_random_event(self,event,dragon):
+        # roll a 6 sided die to determine the event
+        # events are as follows:
+        # 1. Attacked by slayers - at the beginning of each round, roll a 6 sided die, if the roll is a 1, the dragon takes 1 damage
+        # 2. Wrath of Gaia - dragon gets a -3 to all rolls
+        # 3. The call of Shalkith - dragon may not flee or be in alliances with others
+        # 4. Breath of Gaia - +1 combat die to all defense rolls
+        # 5. Wisdom of the Ancients - +1 combat die to all attack rolls
+        # 6. The Sage Towers - all spells cost 2 less essence to use
+        # add these events to the dragons status effects
 
+        # determine if we're setting self.challenger or self.challengee based on dragon value
+        if dragon == 'challenger':
+            dragon = self.challenger
+        elif dragon == 'challengee':
+            dragon = self.challengee
+        else:
+            raise ValueError("Invalid dragon value")
+        
+        # if a selected event already exists, do not add it again
+        if event == 1:
+            if "Attacked by slayers" in dragon["status_effects"]:
+                return
+            dragon["status_effects"].append("Attacked by slayers")
+            self.challenge['log'].append("Slayers have been spotted in the area. They appear to be tracking "+dragon["name"]+" and are closing in on their location")
+        elif event == 2:
+            if "Wrath of Gaia" in dragon["status_effects"]:
+                return
+            dragon["status_effects"].append("Wrath of Gaia")
+            self.challenge['log'].append("The wrath of Gaia has been invoked. "+dragon["name"]+" will suffer a -3 to all rolls")
+            dragon["roll_adjustment"] -= 3
+        elif event == 3:
+            if "The call of Shalkith" in dragon["status_effects"]:
+                return
+            dragon["status_effects"].append("The call of Shalkith")
+            self.challenge['log'].append(dragon["name"]+" has entered a frenzy as the call of Shalkith has overtaken them. They may not flee or be in alliances with others")
+        elif event == 4:
+            if "Breath of Gaia" in dragon["status_effects"]:
+                return
+            dragon["status_effects"].append("Breath of Gaia")
+            self.challenge['log'].append("The Breath of Gaia has shrouded "+dragon["name"]+"  in a protective aura. They will receive +1 combat die to all defense rolls")
+            dragon["defense_die_bonus"] += 1
+        elif event == 5:
+            if "Wisdom of the Ancients" in dragon["status_effects"]:
+                return
+            dragon["status_effects"].append("Wisdom of the Ancients")
+            self.challenge['log'].append("The Wisdom of the Ancients has been bestowed upon "+dragon["name"]+". They will receive +1 combat die to all attack rolls")
+            dragon["attack_die_bonus"] += 1
+        elif event == 6:
+            if "The Sage Towers" in dragon["status_effects"]:
+                return
+            dragon["status_effects"].append("The Sage Towers")
+            self.challenge['log'].append(dragon["name"]+" has entered a magical field created by the Sage Towers. All spells will cost 2 less essence to use")
+            dragon["essence_adjustment"] -= 2
+        else:
+            raise ValueError("Invalid event value")
+        
+        # set the dragon back to self object
+        if dragon == self.challenger:
+            self.challenger = dragon
+        elif dragon == self.challengee:
+            self.challengee = dragon
+        else:
+            raise ValueError("Invalid dragon value")
+        
+
+
+
+
+
+
+
+
+        
+
+      
+        
     def log_combat(self):
         # create a combat log file if it doesn't exist
         # if it does exist, append the combat to the file
@@ -127,45 +223,19 @@ class Combat:
             challenger_roll = random.randint(1,6)
             challengee_roll = random.randint(1,6)
             # if the roll is a 1, a random event occurs, roll a 6 sided die to determine the event
-            # events are as follows:
-            # 1. Attacked by slayers
-            # 2. Wrath of Gaia
-            # 3. The call of Shalkith
-            # 4. Breath of Gaia
-            # 5. Wisdom of the Ancients
-            # 6. The Sage Towers
-            # add these events to the dragons status effects
             if challenger_roll == 1:
                 event = random.randint(1,6)
-                if event == 1:
-                    self.challenger["status_effects"].append("Attacked by slayers")
-                elif event == 2:
-                    self.challenger["status_effects"].append("Wrath of Gaia")
-                elif event == 3:
-                    self.challenger["status_effects"].append("The call of Shalkith")
-                elif event == 4:
-                    self.challenger["status_effects"].append("Breath of Gaia")
-                elif event == 5:
-                    self.challenger["status_effects"].append("Wisdom of the Ancients")
-                elif event == 6:
-                    self.challenger["status_effects"].append("The Sage Towers")
+                self.assign_random_event(event,'challenger')
             if challengee_roll == 1:
                 event = random.randint(1,6)
-                if event == 1:
-                    self.challengee["status_effects"].append("Attacked by slayers")
-                elif event == 2:
-                    self.challengee["status_effects"].append("Wrath of Gaia")
-                elif event == 3:
-                    self.challengee["status_effects"].append("The call of Shalkith")
-                elif event == 4:
-                    self.challengee["status_effects"].append("Breath of Gaia")
-                elif event == 5:
-                    self.challengee["status_effects"].append("Wisdom of the Ancients")
-                elif event == 6:
-                    self.challengee["status_effects"].append("The Sage Towers")
+                self.assign_random_event(event,'challengee')
+
+                
+                
 
 
             # set the combat step to 3
+            
             self.challenge["combat_step"] = 3
 
             # update the challengae json file to reflect the new status effects and the new combat step
@@ -302,6 +372,12 @@ class Combat:
             if config.debug:
                 print("step 5")
             rest = False
+
+            # check and see if dragon is being attacked by slayers
+
+
+
+
             # the dragon who's active_turn is true announces intent
             # for now dragons will only attack with claw attack 
 
@@ -323,11 +399,30 @@ class Combat:
                 self.attack_actions = self.challengee_actions
                 self.defender = self.challenger
            
-            
+            #check and see if attacker is being attacked by slayers 
+            if "Attacked by slayers" in self.attacker["status_effects"]:
+                if random.randint(1,6) == 1:
+                    self.attacker["life"] -= 1
+                    self.challenge["log"].append("Slayers have attacked "+self.attacker["name"]+" and dealt 1 damage")
+                    if self.attacker["life"] <= 0:
+                        self.challenge["log"].append("Slayers have killed "+self.attacker["name"])
+                        self.winner = self.defender
+                        self.loser = self.attacker
+                        self.finish_combat()
+                        return self.winner, self.loser
             while True:
                 movetype = random.choice(choices)
                 move = 0
-                if movetype == 'skills':
+
+                #if health is less than 40% of max health, and has atleast 2 essence, use heal
+                if self.attacker["life"] <= self.attacker["max_life"] * .4 and self.attacker["essence"] >= 2:
+                    movetype = 'abilities'
+                    move = 'heal'
+                    missing_health = self.attacker["max_life"] - self.attacker["life"]
+                    essence_cost_to_max = missing_health // 2
+                    
+
+                elif movetype == 'skills':
                     # select a random skill from the skills dict
                     # only select a skill if the value is greater than 0
                     try:
@@ -365,6 +460,7 @@ class Combat:
                 if usable == False:
                     if config.debug:
                         print("The move {} is not usable by {}".format(move,self.attacker["name"]))
+                        input("Press enter to continue")
                     continue
                 else:
                     pass
@@ -389,34 +485,61 @@ class Combat:
                     # if the dragon does not have enough essence, there is a 20% chance they will rest to regain essence
                     if random.randint(1,5) == 1:
                         rest = True
+                        self.attacker["essence"] += 1
+                        self.attacker["rested_bonus"] = True
                         break
                     else:
                         continue
 
 
             if rest == False:
-                result,max_damage,cost = self.attack_actions.use(movetype,move,cost,self.attacker,self.defender)
-                damage = max_damage
-                if config.debug:
+                roll_log = ''
+                if move == 'heal':
+                    # essence_cost_to_max or max essence available in multiples of 2, whatever is lower
+                    cost = min(self.attacker["essence"],essence_cost_to_max)
+                    #restore 1 health for every 2 essence spent
+                    heal = cost // 2
+                    self.attacker["life"] += heal
+                    #if life is above max life, set life to max life
+                    if self.attacker["life"] > self.attacker["max_life"]:
+                        self.attacker["life"] = self.attacker["max_life"]
 
-                    print(result,max_damage,cost)
+                    cost = heal * 2
+                    cost += self.attacker["essence_adjustment"]
+                    self.attacker["essence"] -= cost
 
-                # if the result is successful and if the attack was a skill subtract the defenders body from the damage
-                if result == "successful" and movetype == "skills":
-                    damage -= self.defender["body"]
-                # if the result is successful and if the attack was a spell subtract the defenders resist from the damage
-                elif result == "successful" and movetype == "spells":
-                    damage -= self.defender["resist"]
+                    #heal_log = self.attacker["name"]+" spent "+str(cost)+" essence to heal "+str(heal)+" health (essence cost adjusted by "+str(self.attacker["essence_adjustment"])+")"
+                    #self.challenge["log"].append(heal_log)
+                    
+                    result = "successful"
 
-                #defender must always take at least one damage on a successful attack
+                    
 
-                if damage <= 0 and result == "successful":
-                    damage = 1
                 else:
+                    result,max_damage,cost,roll_log = self.attack_actions.use(movetype,move,cost,self.attacker,self.defender)
+                    
+                    self.challenge["log"].append(roll_log)
                     damage = max_damage
+                    if config.debug:
 
-                # subtract the damage from the defenders health
-                self.defender["life"] -= damage
+                        print(result,max_damage,cost)
+
+                    # if the result is successful and if the attack was a skill subtract the defenders body from the damage
+                    if result == "successful" and movetype == "skills":
+                        damage -= self.defender["body"]
+                    # if the result is successful and if the attack was a spell subtract the defenders resist from the damage
+                    elif result == "successful" and movetype == "spells":
+                        damage -= self.defender["resist"]
+
+                    #defender must always take at least one damage on a successful attack
+
+                    if damage <= 0 and result == "successful":
+                        damage = 1
+                    else:
+                        damage = max_damage
+
+                    # subtract the damage from the defenders health
+                    self.defender["life"] -= damage
                 
                 #subtract the cost from the attackers essence
                 self.attacker["essence"] -= cost
@@ -441,6 +564,10 @@ class Combat:
                 if config.debug:
                     print(self.attacker["name"] + " rested to regain essence")
                 pass
+            elif result == "successful" and move == 'heal':
+                lognote = "Round: "+str(self.challenge["rounds"])+" "+self.attacker["name"]+" spent "+str(cost)+" essence to heal "+str(heal)+" health (essence cost adjusted by "+str(self.attacker["essence_adjustment"])+")"
+                self.challenge["log"].append(lognote)
+
             elif result == "successful":
                 lognote1= "Round: "+str(self.challenge["rounds"])+" "+self.attacker["name"]+" used " + move + " on " + self.defender["name"] + " for " + str(damage) + " damage. "
                 lognote2 = self.defender["name"] + " resisted " + str(max_damage-damage) + " damage"
@@ -536,7 +663,7 @@ class Combat:
         #method to check if a skill or spell is above 0 and if its essense use is less than or equal to the dragons max essence
         # essense used is found in config.breed_abilities
         cost,code = self.retrieve_essense_cost(movetype,move)
-        if code == 'not ready':
+        if code == 'not ready' and movetype != 'abilities':
             return False,0
         if config.debug:
             print("checking the essense cost of {} for {}".format(move,self.attacker["name"]))
@@ -699,6 +826,18 @@ class Combat:
                 print(cost)
                 raise ValueError("Invalid cost")
         #return cost
+        #check for essence cost bonus
+        if skill_spell_or_ability == 'skills':
+            cost += self.attacker["essence_adjustment"]
+            
+        elif skill_spell_or_ability == 'spells':
+            cost += self.attacker["essence_adjustment"]
+        else:
+            pass
+        #cost must not be less than 1
+        if cost < 1:
+            cost = 1
+        
         return cost,code
 
 
