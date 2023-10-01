@@ -419,7 +419,7 @@ class Combat:
                     movetype = 'abilities'
                     move = 'heal'
                     missing_health = self.attacker["max_life"] - self.attacker["life"]
-                    essence_cost_to_max = missing_health // 2
+                    essence_cost_to_max = missing_health * 2
                     
 
                 elif movetype == 'skills':
@@ -506,6 +506,8 @@ class Combat:
 
                     cost = heal * 2
                     cost += self.attacker["essence_adjustment"]
+                    if cost < 1:
+                        cost = 1
                     self.attacker["essence"] -= cost
 
                     #heal_log = self.attacker["name"]+" spent "+str(cost)+" essence to heal "+str(heal)+" health (essence cost adjusted by "+str(self.attacker["essence_adjustment"])+")"
@@ -761,6 +763,18 @@ class Combat:
                         i["development_points"] += 5
                     if self.winner["latter_position"] > self.loser["latter_position"]:
                         i["latter_position"] = self.loser["latter_position"]
+                        lognote = "{} defeated {} and advanced to rank {}".format(self.winner["name"],self.loser["name"],self.loser["latter_position"])
+                        self.challenge["log"].append(lognote)
+                        print(lognote)
+                        
+                        # advance all dragons that are in a latter position greater than the winner by 1
+                        for j in temp:
+                            
+                            if j["latter_position"] >= i["latter_position"] and j['latter_position'] < self.winner["latter_position"] and j["id"] != self.winner["id"]:
+                                j["latter_position"] += 1
+                                lognote = "{} fell to rank {}".format(j["name"],j["latter_position"])
+                                self.challenge["log"].append(lognote)
+                                print(lognote)
 
                 elif i["ownerid"] == self.loser["ownerid"] and i["id"] == self.loser["id"]:
                     i["losses"] += 1
@@ -779,7 +793,8 @@ class Combat:
                         i["development_points"] += 1
 
                     if self.loser["latter_position"] < self.winner["latter_position"]:
-                        i["latter_position"] = self.winner["latter_position"]
+                        #i["latter_position"] = self.winner["latter_position"]
+                        pass
         if death_choice == "Feed on Rival Dragon essence":
             self.death_note = "{} fed on {}'s essence".format(self.winner["name"],self.loser["name"])
         elif death_choice == "Offer Rival Dragon as a tribute to Gaia":
@@ -802,8 +817,9 @@ class Combat:
                     self.loser = i
                      
         #print a summary of the combat
-        if config.debug:
-            print(self.winner["name"] + " defeated " + self.loser["name"] + " in combat")
+        #if config.debug:
+        print(self.winner["name"] + " defeated " + self.loser["name"] + " in combat")
+        print()
         lognote = "{} defeated {} in combat".format(self.winner["name"],self.loser["name"])
         self.challenge["log"].append(lognote)
 
