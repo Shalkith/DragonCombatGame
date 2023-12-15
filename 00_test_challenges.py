@@ -38,11 +38,13 @@ def test_challenge(dayssincechallenge,daycheck):
         unavailable = False
         for c in challenges["challenges"]:
             if c["challenger"]["ownerid"] == d["ownerid"] and c["challenger"]["id"] == d["id"] and c["status"] != "completed":
-                print('Skipping {} because it has an open challenge'.format(d["name"]))
+                if config.debug == True:
+                    print('Skipping {} because it has an open challenge'.format(d["name"]))
                 unavailable = True
                 break
             elif c["challenger"]["ownerid"] == d["ownerid"] and c["challenger"]["id"] == d["id"] and c["status"] == "completed" and c["challenge_completed_time"] < str(three_days_ago) and daycheck:
-                print('Skipping {} because it has issued a challenge in the last {} days'.format(d["name"], dayssincechallenge))
+                if config.debug == True:
+                    print('Skipping {} because it has issued a challenge in the last {} days'.format(d["name"], dayssincechallenge))
                 unavailable = True
                 break
             else:
@@ -79,6 +81,7 @@ def test_challenge(dayssincechallenge,daycheck):
     # create a challenge between the two dragons
     challenge = Challenge()
     
+    print("{} is challenging {} to a fight".format(dragon1["name"], dragon2["name"]))
     challenge.initiate_challenge(dragon1, dragon2)
 
 
@@ -109,11 +112,11 @@ def challenge_loop(days,daycheck):
     
 if __name__ == "__main__":
     #make a number of challenges
-    for i in range(500):
-        # there's a 50% chance that a challenge will be created
+    for i in range(50):
+        # there's an 80% chance that a challenge will be created 
         days = 3
         daycheck = False
-        if random.randint(1,2) == 1:
+        if random.randint(1,100) <= 80:
             #print("Creating a challenge")
             challenge_loop(days,daycheck)
             dragonlatter.create_dragon_html()
