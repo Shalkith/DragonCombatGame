@@ -64,6 +64,12 @@ losses = 0 # number of losses
 claw_attack = 1 # this is a skill
 tail_bash = body # this is a skill and always equal to body
 
+breed_description = {
+    "Red": "Red dragons are the most aggressive and combative of all the breeds.",
+    "Silver": "Silver dragons are the most intelligent and wise of all the breeds.",
+    "Blue": "Blue dragons are the most cunning and stealthy of all the breeds.",
+    "Brown": "Brown dragons are the most resilient and enduring of all the breeds."}
+
 starting_breed_stats = {"Red": {"improvement_cost": 8,
                                 "aging_cost": 50,
                                 "starting_advances": 8,
