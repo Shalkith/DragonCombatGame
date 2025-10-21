@@ -1,33 +1,151 @@
-#create a sample flask app
-import flask
-from flask import url_for
-import json
-import config
-app = flask.Flask(__name__)
+from fastapi import FastAPI, HTTPException
+from fastapi.middleware.cors import CORSMiddleware
+from fastapi.responses import HTMLResponse
+from fastapi.staticfiles import StaticFiles
+from pydantic import BaseModel, Field
+import os
+import sys
 
-@app.route("/")
-def index():
-    return "Hello World!"
+from hatching_dragons import generatedragons, random_breed
+from challenges import Challenge
 
+# Add the backend directory to the Python path
+sys.path.append(os.path.join(os.path.dirname(__file__), 'webscripts'))
+from webscripts.dragon_api import get_dragon , get_player_dragons, check_challenge_status, cpu_start_challenge, check_for_repeated_name
+from webscripts.dragon_api import see_my_challenges, get_combat_log, accept_pending_challenges_loop, run_accepted_challenges_loop
+app = FastAPI()
 
-# create a route that will show go to a latter template that will read dragon.json and create a table of dragons
-@app.route("/latter")
-def latter():
-    # read the json
-    with open(config.dragonjson, "r") as file:
-        data = json.load(file)
-        temp = data["dragons"]
-        #sort the dragons
-        temp = sorted(temp, key=lambda k: k['latter_position'])
+def check_combat_log(challengeid: int) -> dict:
+    """Check the combat log for a given challenge ID."""
+    log = get_combat_log(challengeid)
+    if log:
+        return log
+    else:
+        return {"message": "No combat log found for this challenge ID."}    
 
-        #pass it to the template
-        return flask.render_template("latter.html", dragons=temp)
+def check_if_dragon_in_combat(dragon_id: int) -> bool:
+    """Check if a dragon is currently in combat."""
+    # Placeholder implementation
+    return check_challenge_status(dragon_id)
+
+def check_player_has_dragon(playerid: str) -> bool:
+    """Check if a player has at least one dragon."""
+    return get_player_dragons(playerid)
+
+@app.get("/testchallenge")
+def test_challenge_endpoint(days: int = 3, daycheck: bool = False):
+    """Test challenge between two dragons."""
+    result = cpu_start_challenge(days, daycheck)
+    return {"message": result}
+
+@app.get("/acceptchallenge/{challengeid}")
+def accept_challenge(challengeid: int):
+    """Accept a challenge by its ID."""
+    challenge = Challenge()
+    result = challenge.accept_challenge(challengeid)
+    return {"message": result}
+
+@app.get("/acceptallchallenges")
+def accept_all_challenges():
+    """Accept all pending challenges."""
+    result = accept_pending_challenges_loop()
+    return {"message": result}
+
+@app.get("/startacceptedcombats")
+def start_accepted_combats():
+    """Start all accepted combats."""
+    result = run_accepted_challenges_loop()
+    return {"message": result}
+
+@app.get("/combatlog/{challengeid}")
+def combat_log(challengeid: int):
+    """Retrieve the combat log for a given challenge ID."""
+    log = check_combat_log(challengeid)
+    return log
+
+@app.get("/mychallenges/{playerid}")
+def my_challenges(playerid: str):
+    """Retrieve all challenges for a given player."""
+    challenges = see_my_challenges(playerid)
+    return {"challenges": challenges}
+
+@app.get("/dragon/{dragon_id}")
+def dragon(dragon_id: int):
+    """Retrieve dragon information by ID."""
+    dragon = get_dragon(dragon_id)
+    if "error" in dragon:
+        raise HTTPException(status_code=404, detail=dragon["error"])
+    return dragon
+
+@app.get("/makeplayerdragon/{playerid}/{breed}/{name}")
+def make_player_dragon(playerid: str, breed: str, name: str):
+    has_dragon,userdragon = check_player_has_dragon(playerid)
+    if has_dragon:
+        return dragon(userdragon[0])
+    else:
+        if check_for_repeated_name(name):
+            return {"error": "Dragon name already exists. Please choose a different name."}
+        try:
+            succeeded,dragon_ids = generatedragons(name,breed,playerid,1,autogenerage=True)
+            if not succeeded:
+                return {"error": dragon_ids} 
+            return dragon(dragon_ids[0])
+        except Exception as e:
+            raise HTTPException(status_code=500, detail=str(e))
+
+@app.get("/makenpcdragon/{quantity}")
+def make_npc_dragon(quantity: int):
+    """Generate a specified number of NPC dragons."""
+    dragons = []
+    try:
+        succeeded,dragon_ids = generatedragons('RandomName','RandomBreed','cpu',quantity)
+        if not succeeded:
+            return {"error": dragon_ids}
+        for dragon_id in dragon_ids:
+            dragons.append(dragon(dragon_id))
+        return {"dragons": dragons}
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
+@app.get("/initiatechallenge/{dragon1}/{dragon2}")
+def initiate_challenge(dragon1: int, dragon2: int):
+    """Initiate a challenge between two dragons."""
+    self_chalenge = dragon1 == dragon2
+    if self_chalenge:
+        return {"message": "A dragon cannot challenge itself."}
     
+    challenge = Challenge()
+    challenger = get_dragon(dragon1)
+    defender = get_dragon(dragon2)
 
+    d1_latter_position = challenger['latter_position']
+    d2_latter_position = defender['latter_position']
+    position_diff = abs(d1_latter_position - d2_latter_position)
+    if position_diff > 5:
+        return {"message": f"{challenger['name']} can only challenge dragons within 5 ranks. {defender['name']} is {position_diff} ranks away."}
+    status1 = check_if_dragon_in_combat(dragon1)
+    if status1:
+        return {"message": f"{challenger['name']} is already in combat."}
+    status2 = check_if_dragon_in_combat(dragon2)
+    if status2:
+        return {"message": f"{defender['name']} is already in combat."}
+    challenge.initiate_challenge(challenger, defender)
+    return {"message": f"Challenge initiated between {challenger['name']} and {defender['name']}"}    
+
+@app.get("/health", summary="Health Check")
+def health_check():
+    """Check the health of the API and its dependencies."""
+    health_status = {"status": "healthy"}
+    
+    try:
+        dependency_status = True  # Replace with actual check
+        if not dependency_status:
+            health_status["status"] = "degraded"
+    except Exception as e:
+        health_status["status"] = "degraded"
+    return health_status
 
 
 if __name__ == "__main__":
-    app.run(debug=True)
-#
-
-
+    import uvicorn
+    uvicorn.run(app, host="127.0.0.1", port=8000)

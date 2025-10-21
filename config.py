@@ -70,6 +70,12 @@ breed_description = {
     "Blue": "Blue dragons are the most cunning and stealthy of all the breeds.",
     "Brown": "Brown dragons are the most resilient and enduring of all the breeds."}
 
+tone_description = {
+    "Neutral": "Your personality is calm and balanced, guided by reason rather than passion. You act with quiet confidence, observing the world without haste or bias, and letting logic shape your path.",
+    "Ominous": "Your personality is dark and foreboding, carrying an air of ancient power. Others sense unease in your presence, as if you know truths best left unspoken. You move with purpose and speak with quiet authority.",
+    "Friendly": "Your personality is warm and approachable, marked by kindness and good humor. You find joy in connection and conversation, valuing trust and loyalty above all else. Your presence puts others at ease."
+}
+
 starting_breed_stats = {"Red": {"improvement_cost": 8,
                                 "aging_cost": 50,
                                 "starting_advances": 8,
@@ -536,13 +542,13 @@ def generate_character_description(tone):
 
 def random_tone(breed):
     if breed == "Red":
-        tone = random.choice(["ominous", "ominous", "ominous", "ominous", "friendly", "neutral"])
+        tone = random.choice(["Ominous", "Ominous", "Ominous", "Ominous", "Friendly", "Neutral"])
     elif breed == "Blue":
-        tone = random.choice(["friendly", "friendly", "friendly", "friendly", "ominous", "neutral"])
+        tone = random.choice(["Friendly", "Friendly", "Friendly", "Friendly", "Ominous", "Neutral"])
     elif breed == "Silver":
-        tone = random.choice(["neutral", "neutral", "neutral", "ominous","friendly", "friendly"])
+        tone = random.choice(["Neutral", "Neutral", "Neutral", "Ominous","Friendly", "Friendly"])
     elif breed == "Brown":
-        tone = random.choice(["neutral", "neutral", "neutral", "ominous", "ominous", "friendly"])
+        tone = random.choice(["Neutral", "Neutral", "Neutral", "Ominous", "Ominous", "Friendly"])
     else:
-        tone = "neutral"
+        tone = "Neutral"
     return tone

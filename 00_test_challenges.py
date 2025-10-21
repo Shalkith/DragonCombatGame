@@ -22,6 +22,9 @@ def test_challenge(dayssincechallenge,daycheck):
 
     with open(config.dragonjson, "r") as f:
         dragons = json.load(f)
+        #only include cpu dragons
+        cpudragons={} 
+        cpudragons["dragons"] = [d for d in dragons["dragons"] if d["ownerid"] == "cpu"]
     # select a random dragon from the json file
     # select a random dragon that has not issued a challenge in the last three days
 
@@ -34,7 +37,7 @@ def test_challenge(dayssincechallenge,daycheck):
     
     # create a list of dragons that have not issued a challenge in the last three days
     available_dragons = []
-    for d in dragons["dragons"]:
+    for d in cpudragons["dragons"]:
         unavailable = False
         for c in challenges["challenges"]:
             if c["challenger"]["ownerid"] == d["ownerid"] and c["challenger"]["id"] == d["id"] and c["status"] != "completed":
@@ -83,6 +86,7 @@ def test_challenge(dayssincechallenge,daycheck):
     
     print("{} is challenging {} to a fight".format(dragon1["name"], dragon2["name"]))
     challenge.initiate_challenge(dragon1, dragon2)
+    return "{} has challenged {}".format(dragon1["name"], dragon2["name"])
 
 
 

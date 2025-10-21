@@ -118,18 +118,6 @@ class Combat:
         else:
             raise ValueError("Invalid dragon value")
         
-
-
-
-
-
-
-
-
-        
-
-      
-        
     def log_combat(self):
         # create a combat log file if it doesn't exist
         # if it does exist, append the combat to the file
@@ -171,7 +159,6 @@ class Combat:
                     break
         with open(self.challengesjson, "w") as file:
             json.dump(data, file, indent=4)
-
 
     def combat_round(self):
         # comban turns have 7 steps
@@ -691,10 +678,6 @@ class Combat:
         else:
             raise ValueError("Invalid movetype")
         
-            
-    
-            
-
     def start_combat(self):
         # set the status of the challenge to in progress
         self.challenge["status"] = "in progress"

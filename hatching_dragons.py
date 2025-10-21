@@ -30,7 +30,7 @@ import math
 import os 
 import config
 import dragonlatter
-
+from webscripts.ollama_helper import OllamaHelper
 # create a class for the dragon
 class HatchDragon:
     # create a constructor method
@@ -61,8 +61,24 @@ class HatchDragon:
                 self.description = config.yanthas_description
                 self.tone = 'ominous'
             else:
+                ollama_helper = OllamaHelper()
+                
                 self.tone = config.random_tone(self.breed)
-                self.description = config.generate_character_description(self.tone)
+                self.name = ollama_helper.generate_name(self.breed,self.tone)
+                nameexists = True
+                while nameexists:
+                    nameexists = False
+                    with open(config.dragonjson, "r") as f:
+                        dragons = json.load(f)
+                    for d in dragons["dragons"]:
+                        if d["name"].lower() == self.name.lower():
+                            nameexists = True
+                            self.name = ollama_helper.generate_name(self.breed,self.tone)
+                self.description  =  ollama_helper.generate_description(self.breed,self.name,self.tone)
+                #self.description = config.generate_character_description(self.tone)
+        else:
+            self.tone = ''
+            self.description = '' 
 
 
         self.id = self.read_json() + 1
@@ -528,15 +544,16 @@ class HatchDragon:
                 print()
                 input('.')
                 pass
-    def create_dragon(self):
+    def create_dragon(self,autogenerate=False):
             # if the owner is cpu, call the cpu_buff function
             # this will increase the dragon's stats and age based on its latter position
             # then call the allocate_points function to allocate the advancement points
             # then call the advance_age function to increase the dragon's stats based on its age
 
             # if the owner is not cpu, ask the user to enter the dragon's stats
-            if self.ownerid == 'cpu':
-                self.cpu_buff()
+            if self.ownerid == 'cpu' or autogenerate==True:
+                if self.ownerid == 'cpu':
+                    self.cpu_buff()
                 self.assign_skills_spells_abilities()
                 self.allocate_points()
                 self.advance_age()
@@ -910,6 +927,7 @@ class HatchDragon:
         print("Skills: " + str(self.skills_dict))
         print("Spells: " + str(self.spells_dict))
         print("abilities: " + str(self.abilities_dict))
+        return self.id
 
 def random_name(breed):
     #generate a function to create a random name - the name should sound like a dragon name
@@ -960,23 +978,34 @@ def random_breed():
         breeds = config.all_breeds
         # return the breed
         return random.choice(breeds),breeds
-def generatedragons(name,breed,ownerid,dragoncount):
+def generatedragons(name,breed,ownerid,dragoncount,autogenerage=False):
 
     dragons = []
 
-    if ownerid == 'cpu':
+    if ownerid == 'cpu' or autogenerage==True:
         #generate n random names
         names = []
+        ids = []
         for i in range(dragoncount):
-            breed,breeds = random_breed()
-            name = random_name(breed)
+            if ownerid != 'cpu':
+                _,breeds = random_breed()
+
+                if breed not in breeds:
+                    return False,"Invalid breed. Options are Red, Blue, Silver, Brown"
+                name = name
+            else:
+                breed,breeds = random_breed()
+                name = random_name(breed)
             
             dragon = HatchDragon(name, breed, ownerid)
-            dragon.create_dragon()
+            dragon.create_dragon(autogenerate=True)
             dragons.append(dragon)
             dragon.save_dragon()
             # print the dragon's stats
-            dragon.print_stats()    
+            dragon_id = dragon.print_stats()    
+            names.append(name)
+            ids.append(dragon_id)
+        return True, ids
 
 
     else: #ownerid is not cpu

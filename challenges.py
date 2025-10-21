@@ -27,14 +27,18 @@ class Challenge:
         with open(self.challengesjson, "r") as file:
             data = json.load(file)
             temp = data["challenges"]
+            status = None
             for i in temp:
                 if i["challengeid"] == challengeid and i["status"] == "pending":
                     i["status"] = "accepted"
-                    break
+                    status = "Challenge accepted"
+                if i["challengeid"] == challengeid and i["status"] != "pending":
+                    status =  f"This challenge is already {i['status']}"
             else:
-                raise ValueError("Challenge not found")
+                status = "A pending challenge with that ID was not found"
         with open(self.challengesjson, "w") as file:
             json.dump(data, file, indent=4)
+        return status
 
     def initiate_challenge(self, challenger,challengee):
         #create an empty challenges.json file if it doesn't exist
