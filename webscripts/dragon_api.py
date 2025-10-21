@@ -5,6 +5,103 @@ from combat import Combat
 from datetime import datetime, timedelta
 import random
 
+def get_available_skills(dragon_id):
+    dragon = get_dragon(dragon_id)
+    age = dragon['age']
+    breed = dragon['breed']
+    breed_stats = ['attack', 'defense', 'body', 'intellect', 'will', 'resist', 'speed', 'discipline', 'life', 'essence']
+    breed_abilities = config.breed_abilities[breed]['abilities']
+    breed_skills = config.breed_abilities[breed]['skills']
+    breed_spells = config.breed_abilities[breed]['spells']
+    available = []
+    for stat in breed_stats:
+        type = 'stat'
+        available.append({'name': stat, 'type': type, 'effect': ''})
+    for ability in breed_abilities:
+        type = 'abilities'
+        if breed_abilities[ability]['minimum_age'] <= age:
+            available.append({'name': ability, 'type': type, 'effect': breed_abilities[ability]['effect']})
+    for skill in breed_skills:
+        type = 'skills'
+        if breed_skills[skill]['minimum_age'] <= age:
+            available.append({'name': skill, 'type': type, 'effect': breed_skills[skill]['effect']})
+    for spell in breed_spells:
+        type = 'spells'
+        if breed_spells[spell]['minimum_age'] <= age:
+            available.append({'name': spell, 'type': type, 'effect': breed_spells[spell]['effect']})
+    return available
+
+def can_improve_stat(dragon, stat,available_skills,discipline_level,breed):
+    #stat must be in available skills
+    for row in available_skills:
+        if row['name'] == stat:
+            type = row['type']
+            break
+    else:
+        return False, f"{stat} not available to improve",'type'
+    #new level cant exceed discipline level
+    if type == 'stat':
+        currentstat = dragon[stat]
+    else:
+        try:
+            currentstat = dragon[type][stat]
+        except KeyError:
+            currentstat = 0
+    if currentstat+1 > discipline_level and stat != 'discipline' and type != 'stat':
+        return False, "Discipline level too low",type
+    #if type is stat, it cant exceed the ceiling for the breed
+    if type == 'stat':
+        ceiling = config.breed_stats_ceiling[breed][f'ceiling_{stat}']
+        if currentstat+1 > ceiling:
+            return False, f"{stat} has reached the breed ceiling of {ceiling}",type
+    return True, "Can improve stat",type
+
+
+def improve_dragon_stat(dragon_id, stat):
+    if stat == 'tail_bash':
+        return False, "Cannot improve tail_bash directly. It improves automatically with body."
+    with open(config.dragonjson, "r") as f:
+        dragons = json.load(f)
+    for d in dragons["dragons"]:
+        if d["id"] == dragon_id:
+            advances = d["advances"]
+            development_points = d["development_points"]
+            breed = d["breed"]
+            improvement_cost = config.starting_breed_stats[breed]['improvement_cost']
+            if advances <= 0:
+                spendtype = "development points"
+                available = development_points
+            else:
+                spendtype = "advances"
+                available = advances
+            if available <= 0:
+                return False, f"Not enough {spendtype} to improve stat"
+            if spendtype == "development points":
+                if development_points < improvement_cost:
+                    return False, f"Not enough development points to improve stat. Need at least {improvement_cost}."
+            
+            available_skills = get_available_skills(dragon_id)
+            can_improve, message,type = can_improve_stat(d, stat, available_skills, d['discipline'], d['breed'])
+            if not can_improve:
+                return False, message
+            if type == 'stat':
+                d[stat] += 1
+                #if stat is body, also improve tail_bash by 1 automatically
+                if stat == 'body':
+                    d['Skills']['tail_bash'] += 1
+            else:
+                if stat in d[type]:
+                    d[type][stat] += 1
+                else:
+                    d[type][stat] = 1
+            if spendtype == "development points":
+                d["development_points"] -= improvement_cost
+            else:
+                d["advances"] -= 1
+            with open(config.dragonjson, "w") as f:
+                json.dump(dragons, f, indent=4)
+            return True, f"Improved {stat} of dragon ID {dragon_id}"
+    return False, "Dragon not found"
 
 def check_for_repeated_name(name):
     with open(config.dragonjson, "r") as f:
@@ -54,6 +151,8 @@ def run_accepted_challenges_loop():
 def cpu_start_challenge(dayssincechallenge,daycheck):
     with open(config.dragonjson, "r") as f:
         dragons = json.load(f)
+        # remove dragosn with advances > 0
+        dragons["dragons"] = [d for d in dragons["dragons"] if d["advances"] == 0]
         cpudragons={} 
         cpudragons["dragons"] = [d for d in dragons["dragons"] if d["ownerid"] == "cpu"]
     with open(config.challengesjson, "r") as f:
@@ -148,6 +247,14 @@ def get_player_dragons(playerid):
             continue
         
     return has_dragon,player_dragons
+
+def get_dragons():
+    # Simulated function to get all dragons
+    jsonfile = 'json_files/dragon.json'
+    #read the json file
+    with open(jsonfile, 'r') as f:
+        dragons_data = json.load(f)
+    return dragons_data['dragons']
 
 def get_dragon(dragon_id):
     # Simulated function to get dragon data

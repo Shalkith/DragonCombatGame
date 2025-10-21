@@ -31,6 +31,7 @@ import os
 import config
 import dragonlatter
 from webscripts.ollama_helper import OllamaHelper
+from datetime import datetime
 # create a class for the dragon
 class HatchDragon:
     # create a constructor method
@@ -560,6 +561,7 @@ class HatchDragon:
                 
             else:
                 self.assign_skills_spells_abilities()
+                return None
                 while True:
 
 
@@ -843,6 +845,7 @@ class HatchDragon:
                             self.abilities_dict[ability] = getattr(self, ability)
                         # set tailbash in dict to body
                         self.skills_dict["tail_bash"] = self.body
+
                         
                         break
                     else:
@@ -855,7 +858,7 @@ class HatchDragon:
             data = json.load(file)
             # return the number of dragons in the json file
             return len(data["dragons"])
-    def save_dragon(self):
+    def save_dragon(self,autogeneragete=False):
         # create a method to save the dragon to the json file
         # open the json file
         with open(self.dragonjson , "r") as file:
@@ -872,6 +875,7 @@ class HatchDragon:
 
             tempdragon = {}
             tempdragon["id"] = self.id
+            tempdragon["hatchdate"] = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
             tempdragon["ownerid"] = self.ownerid
             tempdragon["name"] = self.name
             tempdragon["breed"] = self.breed
@@ -896,6 +900,14 @@ class HatchDragon:
             tempdragon["wins"] = self.wins
             tempdragon["losses"] = self.losses
             tempdragon["latter_position"] = self.latter_position
+            
+            if self.ownerid == 'cpu':
+                tempdragon["advances"] = 0
+            elif autogeneragete==True:
+                tempdragon["advances"] = 0
+            else:
+                tempdragon["advances"] = self.starting_advances
+                
 
             # append the dragon to the json file
             data["dragons"].append(tempdragon)
@@ -1000,7 +1012,7 @@ def generatedragons(name,breed,ownerid,dragoncount,autogenerage=False):
             dragon = HatchDragon(name, breed, ownerid)
             dragon.create_dragon(autogenerate=True)
             dragons.append(dragon)
-            dragon.save_dragon()
+            dragon.save_dragon(autogenerage)
             # print the dragon's stats
             dragon_id = dragon.print_stats()    
             names.append(name)

@@ -1,0 +1,18 @@
+<h2>Challenges</h2>
+<p>View and manage active challenges.</p>
+<button onclick="acceptAll()">Accept All Pending</button>
+<button onclick="startCombats()">Start Accepted Combats</button>
+<div id="challenge-output"></div>
+
+<script>
+async function acceptAll() {
+    const res = await fetch('/acceptallchallenges');
+    const data = await res.json();
+    document.getElementById('challenge-output').innerText = data.message;
+}
+async function startCombats() {
+    const res = await fetch('/startacceptedcombats');
+    const data = await res.json();
+    document.getElementById('challenge-output').innerText = data.message;
+}
+</script>

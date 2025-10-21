@@ -75,4 +75,3 @@ if __name__ == "__main__":
     create_combat_log_json()
     #generate_dragons()
     damage_chart.generate_damagechart()
-    dragonlatter.create_dragon_html()

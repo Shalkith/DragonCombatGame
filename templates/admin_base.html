@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Shalkith Admin Panel</title>
+    <style>
+        body {
+            margin: 0;
+            font-family: "Segoe UI", Arial, sans-serif;
+            background-color: #111;
+            color: #eee;
+        }
+
+        /* Top Navbar */
+        nav {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: #1e1e1e;
+            border-bottom: 2px solid #333;
+            padding: 0.75rem 1.5rem;
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+        }
+
+        nav .logo {
+            font-size: 1.3rem;
+            font-weight: bold;
+            color: #ff4747;
+        }
+
+        nav .nav-links {
+            display: flex;
+            gap: 1rem;
+        }
+
+        nav .nav-links a {
+            color: #ccc;
+            text-decoration: none;
+            font-weight: 500;
+            padding: 0.4rem 0.8rem;
+            border-radius: 6px;
+            transition: 0.2s ease;
+        }
+
+        nav .nav-links a:hover,
+        nav .nav-links a.active {
+            background: #ff4747;
+            color: #fff;
+        }
+
+        main {
+            padding: 2rem;
+        }
+
+        .content {
+            border: 1px solid #333;
+            border-radius: 10px;
+            padding: 2rem;
+            background: #1a1a1a;
+            min-height: 60vh;
+            text-align: center;
+        }
+    </style>
+</head>
+<body>
+    <nav>
+        <div class="logo">Shalkith Admin</div>
+        <div class="nav-links">
+            <a href="#" class="active" data-section="dashboard">Dashboard</a>
+            <a href="#" data-section="dragons">Dragons</a>
+            <a href="#" data-section="challenges">Challenges</a>
+            <a href="#" data-section="generate_dragons">Generate Dragons</a>            
+            <a href="#" data-section="settings">Settings</a>
+        </div>
+    </nav>
+    
+
+    
+
+
+<script>
+const links = document.querySelectorAll(".nav-links a");
+const content = document.getElementById("content");
+
+links.forEach(link => {
+    link.addEventListener("click", async (e) => {
+        e.preventDefault();
+        links.forEach(l => l.classList.remove("active"));
+        link.classList.add("active");
+        const section = link.dataset.section;
+        await loadSection(section);
+    });
+});
+
+async function loadSection(section) {
+    try {
+        const res = await fetch(`/admin/${section}`);
+        const html = await res.text();
+        content.innerHTML = html;
+    } catch (err) {
+        content.innerHTML = `<p style="color:red;">Error loading section: ${err}</p>`;
+    }
+}
+
+// Load dashboard by default
+loadSection("dashboard");
+</script>
+</body>
+</html>

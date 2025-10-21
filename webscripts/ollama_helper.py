@@ -44,7 +44,10 @@ class OllamaHelper:
         {"role": "system", "content": "Shalkith is the title of the ruler of all dragons, the one who has conquered all others and claimed dominion over the world. As a dragon aspiring to become the Shalkith, you must navigate a world filled with peril and opportunity. You will need to make strategic decisions about how to grow your power, form alliances, and defeat your rivals. Your ultimate goal is to become the last dragon standing, the Shalkith, ruling over all other dragons and shaping the fate of the world."},
         {"role": "system", "content": f"You are a {breed} dragon. Your name is {name} but you dont need to tell the user that. They already know. Answer the user's questions accordingly. Do not use any actiobn text or brackets."},
         {"role": "system", "content": f"{tone_desc}"},
-        {"role": "user", "content": "Give me a 3 sentence introduction about yourself and your goals. Do not mention your name. do no use the word {tone} in the description."}
+        {"role": "user", "content": """
+         Give me a 3 sentence introduction about yourself and your goals. 
+         Do not mention your name. Do not say "as a {breed} dragon" or "I am a {breed} dragon".
+         Do not use the word {tone} in the description."""}
     ]
         
        

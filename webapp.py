@@ -1,19 +1,34 @@
-from fastapi import FastAPI, HTTPException
+from fastapi import FastAPI, HTTPException, Request
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import HTMLResponse
 from fastapi.staticfiles import StaticFiles
+from fastapi.templating import Jinja2Templates
 from pydantic import BaseModel, Field
 import os
 import sys
-
+import json 
 from hatching_dragons import generatedragons, random_breed
 from challenges import Challenge
 
 # Add the backend directory to the Python path
 sys.path.append(os.path.join(os.path.dirname(__file__), 'webscripts'))
-from webscripts.dragon_api import get_dragon , get_player_dragons, check_challenge_status, cpu_start_challenge, check_for_repeated_name
-from webscripts.dragon_api import see_my_challenges, get_combat_log, accept_pending_challenges_loop, run_accepted_challenges_loop
+from webscripts.dragon_api import get_dragon, get_dragons , get_player_dragons, check_challenge_status, cpu_start_challenge, check_for_repeated_name
+from webscripts.dragon_api import see_my_challenges, get_combat_log, accept_pending_challenges_loop, run_accepted_challenges_loop,improve_dragon_stat
+from webscripts.dragon_html import * 
+
 app = FastAPI()
+app.mount("/images", StaticFiles(directory="images"), name="images")
+app.mount("/static", StaticFiles(directory="static"), name="static")
+templates = Jinja2Templates(directory="templates")
+
+
+
+@app.get("/test", response_class=HTMLResponse)
+async def test_endpoint(request: Request):
+    dragons = get_dragons()
+    return templates.TemplateResponse(
+        "latter.html", {"request": request, "dragons": dragons}
+    )
 
 def check_combat_log(challengeid: int) -> dict:
     """Check the combat log for a given challenge ID."""
@@ -32,7 +47,17 @@ def check_player_has_dragon(playerid: str) -> bool:
     """Check if a player has at least one dragon."""
     return get_player_dragons(playerid)
 
-@app.get("/testchallenge")
+@app.get("/improve/{dragon_id}/{stat}")
+def improve_dragon_stat_endpoint(dragon_id: int, stat: str):
+    """Improve a specific stat of a dragon."""
+    success,message = improve_dragon_stat(dragon_id, stat)
+    if success:
+        return {"message": f"{message}"}
+    else:
+        raise HTTPException(status_code=400, detail=f"{message}")
+
+
+@app.get("/npc_start_challenge")
 def test_challenge_endpoint(days: int = 3, daycheck: bool = False):
     """Test challenge between two dragons."""
     result = cpu_start_challenge(days, daycheck)
@@ -77,7 +102,7 @@ def dragon(dragon_id: int):
         raise HTTPException(status_code=404, detail=dragon["error"])
     return dragon
 
-@app.get("/makeplayerdragon/{playerid}/{breed}/{name}")
+@app.get("/makeplayerdragon/{playerid}/{breed}/{name}/")
 def make_player_dragon(playerid: str, breed: str, name: str):
     has_dragon,userdragon = check_player_has_dragon(playerid)
     if has_dragon:
@@ -86,7 +111,7 @@ def make_player_dragon(playerid: str, breed: str, name: str):
         if check_for_repeated_name(name):
             return {"error": "Dragon name already exists. Please choose a different name."}
         try:
-            succeeded,dragon_ids = generatedragons(name,breed,playerid,1,autogenerage=True)
+            succeeded,dragon_ids = generatedragons(name,breed,playerid,1,autogenerage=False)
             if not succeeded:
                 return {"error": dragon_ids} 
             return dragon(dragon_ids[0])
@@ -118,6 +143,11 @@ def initiate_challenge(dragon1: int, dragon2: int):
     challenger = get_dragon(dragon1)
     defender = get_dragon(dragon2)
 
+    if challenger['advances'] > 0 :
+        return {"message": f"{challenger['name']} has not completed hatching and cannot challenge other dragons."}
+    if defender['advances'] > 0 :
+        return {"message": f"{defender['name']} has not completed hatching and cannot be challenged."}
+
     d1_latter_position = challenger['latter_position']
     d2_latter_position = defender['latter_position']
     position_diff = abs(d1_latter_position - d2_latter_position)
@@ -132,6 +162,34 @@ def initiate_challenge(dragon1: int, dragon2: int):
     challenge.initiate_challenge(challenger, defender)
     return {"message": f"Challenge initiated between {challenger['name']} and {defender['name']}"}    
 
+@app.get("/latter")
+def latter():
+    """Retrieve the current dragon latter."""
+    jsonfile = 'json_files/dragon.json'
+    with open(jsonfile, 'r') as f:
+        latter_data = f.read()
+
+    html_content = render_ladder(json.loads(latter_data))
+    
+    
+    return HTMLResponse(content=html_content, status_code=200)
+
+@app.get("/", response_class=HTMLResponse)
+def read_root():
+    """Serve the root HTML page."""
+    html_content = """
+    <html>
+        <head>
+            <title>Dragon Combat Game API</title>
+        </head>
+        <body>
+            <h1>Welcome to the Dragon Combat Game API</h1>
+            <p>Use the endpoints to interact with the game.</p>
+        </body>
+    </html>
+    """
+    return HTMLResponse(content=html_content, status_code=200)
+
 @app.get("/health", summary="Health Check")
 def health_check():
     """Check the health of the API and its dependencies."""
@@ -144,6 +202,36 @@ def health_check():
     except Exception as e:
         health_status["status"] = "degraded"
     return health_status
+
+@app.get("/admin", response_class=HTMLResponse)
+async def admin_panel(request: Request):
+    return templates.TemplateResponse("admin_base.html", {"request": request})
+
+
+@app.get("/admin/dashboard", response_class=HTMLResponse)
+async def admin_dashboard(request: Request):
+    return templates.TemplateResponse("admin_dashboard.html", {"request": request})
+
+
+@app.get("/admin/dragons", response_class=HTMLResponse)
+async def admin_dragons(request: Request):
+    dragons = get_dragons()
+    return templates.TemplateResponse("admin_dragons.html", {"request": request, "dragons": dragons})
+
+
+@app.get("/admin/challenges", response_class=HTMLResponse)
+async def admin_challenges(request: Request):
+    return templates.TemplateResponse("admin_challenges.html", {"request": request})
+
+
+@app.get("/admin/settings", response_class=HTMLResponse)
+async def admin_settings(request: Request):
+    return templates.TemplateResponse("admin_settings.html", {"request": request})
+
+@app.get("/admin/generate_dragons", response_class=HTMLResponse)
+async def generate_dragons_page(request: Request):
+    # This page just serves the UI; no dragons data needed
+    return templates.TemplateResponse("admin_generate_dragons.html", {"request": request})
 
 
 if __name__ == "__main__":

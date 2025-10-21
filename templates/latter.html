@@ -1,0 +1,120 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8"/>
+  <meta name="viewport" content="width=device-width,initial-scale=1"/>
+  <title>Dragon Ladder</title>
+  <link rel="stylesheet" href="/static/styles.css">
+</head>
+<body>
+  <div class="container">
+    <div class="header">
+      <div>
+        <h1>Dragon Ladder</h1>
+        <div class="subtitle">Ranked by position — top to bottom</div>
+      </div>
+      <div class="subtitle">Rendered: {{ dragons|length }} dragons</div>
+    </div>
+
+    <div class="cards">
+      {% for dragon in dragons %}
+      <div class="card">
+        <div class="card-left">
+          <div class="rank-badge">#{{ dragon.latter_position }}</div>
+
+          {% if dragon.latter_position == 1 %}
+            <img class="dragon-img" src="/images/{{ dragon.breed.lower() }}_shalkith.png" alt="{{ dragon.name }} image"
+                 onerror="this.onerror=null;this.src='/images/placeholder.png'">
+          {% elif dragon.age == 1 %}
+            <img class="dragon-img" src="/images/{{ dragon.breed }}_hatch.png" alt="{{ dragon.name }} image"
+                 onerror="this.onerror=null;this.src='/images/placeholder.png'">
+          {% elif dragon.age in [2, 3, 4] %}
+            <img class="dragon-img" src="/images/{{ dragon.breed }}_young.png" alt="{{ dragon.name }} image"
+                 onerror="this.onerror=null;this.src='/images/placeholder.png'">
+          {% elif dragon.age in [5, 6, 7] %}
+            <img class="dragon-img" src="/images/{{ dragon.breed }}_adult.png" alt="{{ dragon.name }} image"
+                 onerror="this.onerror=null;this.src='/images/placeholder.png'">
+          {% else %}
+            <img class="dragon-img" src="/images/{{ dragon.breed }}_elder.png" alt="{{ dragon.name }} image"
+                 onerror="this.onerror=null;this.src='/images/placeholder.png'">
+          {% endif %}
+
+          <div class="basic">
+            <h3 class="name">{{ dragon.name }}</h3>
+            <div class="meta">{{ dragon.breed }} • Age {{ dragon.age }} • Owner: {{ dragon.ownerid }}</div>
+          </div>
+        </div>
+
+        <div class="card-right">
+          <div class="description">
+            {{ dragon.description or "No description available." }}
+          </div>
+
+          <div class="stats-grid">
+            <div class="stat"><div class="stat-name">Attack</div><div class="stat-value">{{ dragon.attack }}</div></div>
+            <div class="stat"><div class="stat-name">Defense</div><div class="stat-value">{{ dragon.defense }}</div></div>
+            <div class="stat"><div class="stat-name">Speed</div><div class="stat-value">{{ dragon.speed }}</div></div>
+            <div class="stat"><div class="stat-name">Intellect</div><div class="stat-value">{{ dragon.intellect }}</div></div>
+            <div class="stat"><div class="stat-name">Will</div><div class="stat-value">{{ dragon.will }}</div></div>
+          </div>
+
+          <div class="bottom-row">
+            <div class="favor">
+              <div class="favor-label">Favor: {{ dragon.favor }}</div>
+              <div class="favor-bar">
+                <div class="favor-fill" style="width: {{ dragon.favor if dragon.favor <= 100 else 100 }}%"></div>
+              </div>
+            </div>
+            <div class="record">
+              <div>Wins: <strong>{{ dragon.wins }}</strong></div>
+              <div>Losses: <strong>{{ dragon.losses }}</strong></div>
+            </div>
+          </div>
+
+          <div class="subsections">
+            <div class="subsection">
+              <h4>Skills</h4>
+              {% if dragon.skills %}
+                <div class="kv-list">
+                  {% for k, v in dragon.skills.items() %}
+                    <div class="kv"><div class="k">{{ k }}</div><div class="v">{{ v }}</div></div>
+                  {% endfor %}
+                </div>
+              {% else %}
+                <div class="empty">No skills</div>
+              {% endif %}
+            </div>
+
+            <div class="subsection">
+              <h4>Spells</h4>
+              {% if dragon.spells %}
+                <div class="kv-list">
+                  {% for k, v in dragon.spells.items() %}
+                    <div class="kv"><div class="k">{{ k }}</div><div class="v">{{ v }}</div></div>
+                  {% endfor %}
+                </div>
+              {% else %}
+                <div class="empty">No spells</div>
+              {% endif %}
+            </div>
+
+            <div class="subsection">
+              <h4>Abilities</h4>
+              {% if dragon.abilities %}
+                <div class="kv-list">
+                  {% for k, v in dragon.abilities.items() %}
+                    <div class="kv"><div class="k">{{ k }}</div><div class="v">{{ v }}</div></div>
+                  {% endfor %}
+                </div>
+              {% else %}
+                <div class="empty">No abilities</div>
+              {% endif %}
+            </div>
+          </div>
+        </div>
+      </div>
+      {% endfor %}
+    </div>
+  </div>
+</body>
+</html>
