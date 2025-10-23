@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Wyrmspire</title>
+  <link rel="stylesheet" href="{{ url_for('static', path='style.css') }}">
+  <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;700&family=Open+Sans&display=swap" rel="stylesheet">
+  <script src="{{ url_for('static', path='scripts.js') }}"></script>
+</head>
+<body>
+  <header>
+    <h1>🐉 Wyrmspire: Ascension of the Ancients</h1>
+    <nav>
+      <a href="/ladder">Ladder</a> |
+      <a href="/dashboard">My Dragon</a> |
+      <a href="/challenges">Challenges</a> |
+      <a href="/logout">Logout</a>
+    </nav>
+  </header>
+  <main>
+    {% block content %}{% endblock %}
+  </main>
+</body>
+</html>

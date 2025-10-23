@@ -1,0 +1,47 @@
+{% extends "base.html" %}
+
+{% block content %}
+<main>
+  <h2>Dragon Ladder</h2>
+  <p style="text-align:center; color: var(--accent); margin-bottom: 1.5rem;">
+    The strongest and most feared dragons of the world, ranked by dominance.
+  </p>
+
+  <div class="ladder-list">
+    {% for dragon in dragons|sort(attribute='latter_position') %}
+    <a href="/dragons/{{ dragon.id }}" class="dragon-card-link">
+    <div class="dragon-card">
+      <div class="dragon-rank">
+        <span class="rank-number">#{{ dragon.latter_position }}</span>
+      </div>
+
+      <div class="dragon-header">
+        <h3>
+          {% if dragon.latter_position == 1 %}
+          👑
+          {% endif %}
+          {{ dragon.name }}</h3>
+        <h6>{{dragon.ownerid}}</h6>
+        <p><em>{{ dragon.breed }} Dragon — Age {{ dragon.age }}</em></p>
+      </div>
+
+      <div class="dragon-stats">
+        <p><span class="stat-label">Wins:</span> {{ dragon.wins }}</p>
+        <p><span class="stat-label">Losses:</span> {{ dragon.losses }}</p>
+        <p><span class="stat-label">Favor:</span> {{ dragon.favor }}</p>
+        <p><span class="stat-label">Advances:</span> {{ dragon.advances }}</p>
+      </div>
+
+      <p style="margin-top: 0.75rem; color: #ccc; font-style: italic;">
+        {% if dragon.advances > 0 %}
+        {{ dragon.name }} is still hatching 
+        {% else %}
+        "{{ dragon.description[:180] }}{% if dragon.description|length > 180 %}...{% endif %}"
+        {% endif %}
+      </p>
+    </div>
+  </a>
+    {% endfor %}
+  </div>
+</main>
+{% endblock %}

@@ -1,0 +1,100 @@
+{% extends "base.html" %}
+{% block content %}
+{% if not has_dragon %}
+
+<h2>Create Your Dragon</h2>
+<form method="post" action="/create_dragon">
+  <input type="hidden" name="playerid" value="{{ playerid }}">
+  <label>Dragon Name:</label>
+  <input type="text" name="name" required>
+  <label>Breed:</label>
+  <select name="breed">
+    <option value="Red">Red</option>
+    <option value="Blue">Blue</option>
+    <option value="Silver">Silver</option>
+    <option value="Brown">Brown</option>
+  </select>
+  <button type="submit">Create</button>
+</form>
+{% else %}
+<div class="dragon-card">
+  <h2>{{ dragon.name }}</h2>  
+  {% if not mydragon and dragon.latter_position - player_dragon.latter_position >-5 and dragon.latter_position - player_dragon.latter_position < 5 %}
+<button class="submit-challenge-btn" onclick="submitChallenge({{ player_dragon.id }}, {{ dragon.id }})">
+  Submit Challenge
+</button>
+  {%endif%}
+<div class="dragon-info">
+    <div class="info-column">
+      <p><strong>Breed:</strong> {{ dragon.breed }}</p>
+      <p><strong>Age:</strong> {{ dragon.age }}</p>
+      <p><strong>Development Points:</strong> {{ dragon.development_points }}</p>
+      <p><strong>Favor:</strong> {{ dragon.favor }}</p>
+    </div>
+    <div class="info-column">
+      <p><strong>Wins:</strong> {{ dragon.wins }}</p>
+      <p><strong>Losses:</strong> {{ dragon.losses }}</p>
+      <p><strong>Latter Position:</strong> {{ dragon.latter_position }}</p>
+      <p><strong>Advances:</strong> {{ dragon.advances }}</p>
+    </div>
+  </div>
+
+  <h3>Attributes</h3>
+  <ul class="attribute-list">
+    {% for attr in ["attack", "defense", "body", "intellect", "will", "resist", "speed", "discipline", "life", "essence"] %}
+      <li>
+        <span class="attr-name">{{ attr | title }}</span> 
+        <span id="attr-{{ attr }}" class="attr-value">{{ dragon[attr] }}</span>
+        <!-- only shot buttons if mydragon is true -->
+         {% if mydragon %}
+        <button class="improve-btn" onclick="improve({{ dragon.id }}, 'attr', '{{ attr }}')">+</button>
+        {% endif %}
+      </li>
+    {% endfor %}
+  </ul>
+
+  <h3>Skills</h3>
+  <ul class="skill-list">
+    {% for skill, points in dragon.skills.items() %}
+      <li>
+        <span class="skill-name">{{ skill | replace('_', ' ') | title }}</span>
+        <span id="skill-{{ skill }}" class="skill-points">{{ points }}</span>
+        {% if mydragon %}
+        <button class="improve-btn" onclick="improve({{ dragon.id }},'skill', '{{ skill }}')">+</button>
+        {% endif %}
+      </li>
+    {% endfor %}
+  </ul>
+
+  <h3>Spells</h3>
+  <ul class="spell-list">
+    {% for spell, points in dragon.spells.items() %}
+      <li>
+        <span class="spell-name">{{ spell | replace('_', ' ') | title }}</span>
+        <span id="spell-{{ spell }}" class="spell-points">{{ points }}</span>
+        {% if mydragon %}
+        <button class="improve-btn" onclick="improve({{ dragon.id }},'spell', '{{ spell }}')">+</button>
+        {% endif %}
+      </li>
+    {% endfor %}
+  </ul>
+
+  <h3>Abilities</h3>
+  <ul class="ability-list">
+    {% for ability, points in dragon.abilities.items() %}
+      <li>
+        <span class="ability-name">{{ ability | replace('_', ' ') | title }}</span>
+        {% if mydragon and False %}
+        <span id="ability-{{ ability }}" class="ability-points">{{ points }}</span>
+        <button class="improve-btn" onclick="improve('ability', '{{ ability }}')">+</button>
+        {% endif %}
+      </li>
+    {% endfor %}
+  </ul>
+</div>
+
+
+
+{% endif %}
+{% endblock %}
+

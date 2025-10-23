@@ -53,7 +53,7 @@ def can_improve_stat(dragon, stat,available_skills,discipline_level,breed):
     if type == 'stat':
         ceiling = config.breed_stats_ceiling[breed][f'ceiling_{stat}']
         if currentstat+1 > ceiling:
-            return False, f"{stat} has reached the breed ceiling of {ceiling}",type
+            return False, f"{stat} has reached the {breed} dragon maximum value of {ceiling}",type
     return True, "Can improve stat",type
 
 
@@ -88,7 +88,7 @@ def improve_dragon_stat(dragon_id, stat):
                 d[stat] += 1
                 #if stat is body, also improve tail_bash by 1 automatically
                 if stat == 'body':
-                    d['Skills']['tail_bash'] += 1
+                    d['skills']['tail_bash'] += 1
             else:
                 if stat in d[type]:
                     d[type][stat] += 1
@@ -100,7 +100,7 @@ def improve_dragon_stat(dragon_id, stat):
                 d["advances"] -= 1
             with open(config.dragonjson, "w") as f:
                 json.dump(dragons, f, indent=4)
-            return True, f"Improved {stat} of dragon ID {dragon_id}"
+            return True, {"message":f"Improved {stat} of dragon ID {dragon_id}","new_value": d[stat] if type == 'stat' else d[type][stat]}
     return False, "Dragon not found"
 
 def check_for_repeated_name(name):
@@ -191,17 +191,25 @@ def cpu_start_challenge(dayssincechallenge,daycheck):
         else:
             dragon2 = random.choice(dragons['dragons'][dragon1["latter_position"] - 5:dragon1["latter_position"] + 5])
     challenge = Challenge()
+    status1=check_challenge_status(dragon1["id"])
+    status2=check_challenge_status(dragon2["id"])
+    if status1:
+        return "{} is already in combat.".format(dragon1["name"])
+    if status2:
+        return "{} is already in combat.".format(dragon2["name"])
     challenge.initiate_challenge(dragon1, dragon2)
     return "{} has challenged {}".format(dragon1["name"], dragon2["name"])
 
 
 
-def get_combat_log(challengeid):
+def get_combat_log(challengeid=None):
     # Simulated function to get combat log for a challenge
     jsonfile = 'json_files/combat_log.json'
     #read the json file
     with open(jsonfile, 'r') as f:
         combat_logs = json.load(f)
+    if challengeid is None:
+        return combat_logs['combat_log']
     for log in combat_logs['combat_log']:
         if log['challengeid'] == challengeid:
             return log
